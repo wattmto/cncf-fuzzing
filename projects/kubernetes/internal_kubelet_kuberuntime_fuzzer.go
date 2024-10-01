@@ -19,26 +19,29 @@ import (
 	"context"
 	v1 "k8s.io/api/core/v1"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
+	"testing"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
 )
 
-func FuzzKubeRuntime(data []byte) int {
-	f := fuzz.NewConsumer(data)
-	pod := &v1.Pod{}
-	status := &kubecontainer.PodStatus{}
-	err := f.GenerateStruct(pod)
-	if err != nil {
-		return 0
-	}
-	err = f.GenerateStruct(status)
-	if err != nil {
-		return 0
-	}
-	_, _, m, err := createTestRuntimeManager()
-	if err != nil {
-		return 0
-	}
-	_ = m.computePodActions(context.Background(), pod, status)
-	return 1
+func FuzzKubeRuntime(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		f := fuzz.NewConsumer(data)
+		pod := &v1.Pod{}
+		status := &kubecontainer.PodStatus{}
+		err := f.GenerateStruct(pod)
+		if err != nil {
+			return
+		}
+		err = f.GenerateStruct(status)
+		if err != nil {
+			return
+		}
+		_, _, m, err := createTestRuntimeManager()
+		if err != nil {
+			return
+		}
+		_ = m.computePodActions(context.Background(), pod, status)
+		return
+	})
 }
