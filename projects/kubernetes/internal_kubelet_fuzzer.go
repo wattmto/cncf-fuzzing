@@ -36,90 +36,94 @@ func init() {
 	testing.Init()
 }
 
-func FuzzSyncPod(data []byte) int {
-	syncTypes := []kubetypes.SyncPodType{kubetypes.SyncPodCreate,
-		kubetypes.SyncPodUpdate,
-		kubetypes.SyncPodSync,
-		kubetypes.SyncPodKill}
-	t := &testing.T{}
-	f := fuzz.NewConsumer(data)
-	pod2 := &v1.Pod{}
-	err := f.GenerateStruct(pod2)
-	if err != nil {
-		return 0
-	}
-	syncTypeIndex, err := f.GetInt()
-	if err != nil {
-		return 0
-	}
-	syncType := syncTypes[syncTypeIndex%len(syncTypes)]
-	testKubelet := newTestKubelet(t, false)
-	defer testKubelet.Cleanup()
-	kl := testKubelet.kubelet
-	/*manager := testKubelet.fakeMirrorClient
-	  _ = manager*/
-	pod := podWithUIDNameNs("12345678", "bar", "foo")
-	pod.Annotations[kubetypes.ConfigSourceAnnotationKey] = "file"
-	pods := []*v1.Pod{pod, pod2}
-	kl.podManager.SetPods(pods)
-	_, _ = kl.SyncPod(context.Background(), syncType, pod, nil, &kubecontainer.PodStatus{})
-	return 1
+func FuzzSyncPod(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		syncTypes := []kubetypes.SyncPodType{kubetypes.SyncPodCreate,
+			kubetypes.SyncPodUpdate,
+			kubetypes.SyncPodSync,
+			kubetypes.SyncPodKill}
+		f := fuzz.NewConsumer(data)
+		pod2 := &v1.Pod{}
+		err := f.GenerateStruct(pod2)
+		if err != nil {
+			return
+		}
+		syncTypeIndex, err := f.GetInt()
+		if err != nil {
+			return
+		}
+		syncType := syncTypes[syncTypeIndex%len(syncTypes)]
+		testKubelet := newTestKubelet(t, false)
+		defer testKubelet.Cleanup()
+		kl := testKubelet.kubelet
+		/*manager := testKubelet.fakeMirrorClient
+		  _ = manager*/
+		pod := podWithUIDNameNs("12345678", "bar", "foo")
+		pod.Annotations[kubetypes.ConfigSourceAnnotationKey] = "file"
+		pods := []*v1.Pod{pod, pod2}
+		kl.podManager.SetPods(pods)
+		_, _ = kl.SyncPod(context.Background(), syncType, pod, nil, &kubecontainer.PodStatus{})
+		return
+	})
 }
 
-func FuzzStrategicMergePatch(data []byte) int {
-	if len(data) < 10 {
-		return 0
-	}
-	if (len(data) % 2) != 0 {
-		return 0
-	}
-	original := data[:len(data)/2]
-	patch := data[(len(data)/2)+1:]
-	_, _ = strategicpatch.StrategicMergePatch(original, patch, v1.Node{})
-	return 1
+func FuzzStrategicMergePatch(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		if len(data) < 10 {
+			return
+		}
+		if (len(data) % 2) != 0 {
+			return
+		}
+		original := data[:len(data)/2]
+		patch := data[(len(data)/2)+1:]
+		_, _ = strategicpatch.StrategicMergePatch(original, patch, v1.Node{})
+		return
+	})
 }
 
-func FuzzconvertToAPIContainerStatuses(data []byte) int {
-	t := &testing.T{}
-	f := fuzz.NewConsumer(data)
-	pod := &v1.Pod{}
-	err := f.GenerateStruct(pod)
-	if err != nil {
-		return 0
-	}
+func FuzzConvertToAPIContainerStatuses(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		f := fuzz.NewConsumer(data)
+		pod := &v1.Pod{}
+		err := f.GenerateStruct(pod)
+		if err != nil {
+			return
+		}
 
-	currentStatus := &kubecontainer.PodStatus{} // leave empty at first
-	err = f.GenerateStruct(currentStatus)
-	if err != nil {
-		return 0
-	}
+		currentStatus := &kubecontainer.PodStatus{} // leave empty at first
+		err = f.GenerateStruct(currentStatus)
+		if err != nil {
+			return
+		}
 
-	previousStatus, err := createContainerStatuses(f)
-	if err != nil {
-		return 0
-	}
+		previousStatus, err := createContainerStatuses(f)
+		if err != nil {
+			return
+		}
 
-	containers, err := createContainers(f)
-	if err != nil {
-		return 0
-	}
+		containers, err := createContainers(f)
+		if err != nil {
+			return
+		}
 
-	hasInitContainers, err := f.GetBool()
-	if err != nil {
-		return 0
-	}
+		hasInitContainers, err := f.GetBool()
+		if err != nil {
+			return
+		}
 
-	isInitContainer, err := f.GetBool()
-	if err != nil {
-		return 0
-	}
+		isInitContainer, err := f.GetBool()
+		if err != nil {
+			return
+		}
 
-	testKubelet := newTestKubelet(t, false)
-	defer testKubelet.Cleanup()
-	kl := testKubelet.kubelet
+		testKubelet := newTestKubelet(t, false)
+		defer testKubelet.Cleanup()
+		kl := testKubelet.kubelet
 
-	_ = kl.convertToAPIContainerStatuses(pod, currentStatus, previousStatus, containers, hasInitContainers, isInitContainer)
-	return 1
+		_ = kl.convertToAPIContainerStatuses(pod, currentStatus, previousStatus, containers, hasInitContainers, isInitContainer)
+		return
+	})
 }
 
 func createContainers(f *fuzz.ConsumeFuzzer) ([]v1.Container, error) {
@@ -156,61 +160,63 @@ func createContainerStatuses(f *fuzz.ConsumeFuzzer) ([]v1.ContainerStatus, error
 	return containerStatuses, nil
 }
 
-func FuzzHandlePodCleanups(data []byte) int {
-	t := &testing.T{}
-	f := fuzz.NewConsumer(data)
-	pod := &kubecontainer.Pod{}
-	err := f.GenerateStruct(pod)
-	if err != nil {
-		return 0
-	}
-	podID := pod.ID
+func FuzzHandlePodCleanups(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		f := fuzz.NewConsumer(data)
+		pod := &kubecontainer.Pod{}
+		err := f.GenerateStruct(pod)
+		if err != nil {
+			return
+		}
+		podID := pod.ID
 
-	testKubelet := newTestKubelet(t, false /* controllerAttachDetachEnabled */)
-	defer testKubelet.Cleanup()
+		testKubelet := newTestKubelet(t, false /* controllerAttachDetachEnabled */)
+		defer testKubelet.Cleanup()
 
-	fakeRuntime := testKubelet.fakeRuntime
-	fakeContainerManager := testKubelet.fakeContainerManager
-	fakeContainerManager.PodContainerManager.AddPodFromCgroups(pod) // add pod to mock cgroup
-	fakeRuntime.PodList = []*containertest.FakePod{
-		{Pod: pod},
-	}
-	kubelet := testKubelet.kubelet
-	kubelet.cgroupsPerQOS = true
+		fakeRuntime := testKubelet.fakeRuntime
+		fakeContainerManager := testKubelet.fakeContainerManager
+		fakeContainerManager.PodContainerManager.AddPodFromCgroups(pod) // add pod to mock cgroup
+		fakeRuntime.PodList = []*containertest.FakePod{
+			{Pod: pod},
+		}
+		kubelet := testKubelet.kubelet
+		kubelet.cgroupsPerQOS = true
 
-	kubelet.HandlePodCleanups(context.Background())
-	if actual, expected := kubelet.podWorkers.(*fakePodWorkers).triggeredDeletion, []types.UID{podID}; !reflect.DeepEqual(actual, expected) {
-		panic(fmt.Sprintf("expected %v to be deleted, got %v\n", expected, actual))
-	}
-	fakeRuntime.AssertKilledPods([]string(nil))
+		kubelet.HandlePodCleanups(context.Background())
+		if actual, expected := kubelet.podWorkers.(*fakePodWorkers).triggeredDeletion, []types.UID{podID}; !reflect.DeepEqual(actual, expected) {
+			panic(fmt.Sprintf("expected %v to be deleted, got %v\n", expected, actual))
+		}
+		fakeRuntime.AssertKilledPods([]string(nil))
 
-	return 1
+		return
+	})
 }
 
-func FuzzMakeEnvironmentVariables(data []byte) int {
-	t := &testing.T{}
-	f := fuzz.NewConsumer(data)
-	testPod := &v1.Pod{}
-	err := f.GenerateStruct(testPod)
-	if err != nil {
-		return 0
-	}
-	container := &v1.Container{}
-	err = f.GenerateStruct(container)
-	if err != nil {
-		return 0
-	}
-	podIP, err := f.GetString()
-	if err != nil {
-		return 0
-	}
-	podIPs := make([]string, 0)
-	err = f.CreateSlice(&podIPs)
-	if err != nil {
-		return 0
-	}
-	kl := newTestKubelet(t, false /* controllerAttachDetachEnabled */)
-	defer kl.Cleanup()
-	_, _ = kl.kubelet.makeEnvironmentVariables(testPod, container, podIP, podIPs)
-	return 1
+func FuzzMakeEnvironmentVariables(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		f := fuzz.NewConsumer(data)
+		testPod := &v1.Pod{}
+		err := f.GenerateStruct(testPod)
+		if err != nil {
+			return
+		}
+		container := &v1.Container{}
+		err = f.GenerateStruct(container)
+		if err != nil {
+			return
+		}
+		podIP, err := f.GetString()
+		if err != nil {
+			return
+		}
+		podIPs := make([]string, 0)
+		err = f.CreateSlice(&podIPs)
+		if err != nil {
+			return
+		}
+		kl := newTestKubelet(t, false /* controllerAttachDetachEnabled */)
+		defer kl.Cleanup()
+		_, _ = kl.kubelet.makeEnvironmentVariables(testPod, container, podIP, podIPs)
+		return
+	})
 }
