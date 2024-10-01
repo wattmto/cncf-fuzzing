@@ -36,34 +36,35 @@ func errorHandler() {
 	}
 }
 
-func FuzzRequest(data []byte) int {
-	defer errorHandler()
-	t := &testing.T{}
-	f := fuzz.NewConsumer(data)
-	urlString, err := f.GetString()
-	if err != nil {
-		return 0
-	}
-	ss, err := newTestStreamingServer(100 * time.Millisecond)
-	if err != nil {
-		return 0
-	}
-	defer ss.testHTTPServer.Close()
-	fw := newServerTestWithDebug(true, ss)
-	defer fw.testHTTPServer.Close()
+func FuzzRequest(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		defer errorHandler()
+		f := fuzz.NewConsumer(data)
+		urlString, err := f.GetString()
+		if err != nil {
+			return
+		}
+		ss, err := newTestStreamingServer(100 * time.Millisecond)
+		if err != nil {
+			return
+		}
+		defer ss.testHTTPServer.Close()
+		fw := newServerTestWithDebug(true, ss)
+		defer fw.testHTTPServer.Close()
 
-	url := fw.testHTTPServer.URL + urlString
+		url := fw.testHTTPServer.URL + urlString
 
-	upgradeRoundTripper, err := spdy.NewRoundTripper(nil)
-	if err != nil {
-		return 0
-	}
-	c := &http.Client{Transport: upgradeRoundTripper}
+		upgradeRoundTripper, err := spdy.NewRoundTripper(nil)
+		if err != nil {
+			return
+		}
+		c := &http.Client{Transport: upgradeRoundTripper}
 
-	resp, err := c.Do(makeReq(t, "POST", url, "v4.channel.k8s.io"))
-	if err != nil {
-		return 0
-	}
-	defer resp.Body.Close()
-	return 1
+		resp, err := c.Do(makeReq(t, "POST", url, "v4.channel.k8s.io"))
+		if err != nil {
+			return
+		}
+		defer resp.Body.Close()
+		return
+	})
 }
