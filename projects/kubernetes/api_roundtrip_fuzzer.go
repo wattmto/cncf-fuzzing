@@ -118,22 +118,23 @@ func init() {
 	testing.Init()
 }
 
-func FuzzApiRoundtrip(data []byte) int {
-	t := &testing.T{}
-	f := fuzz.NewConsumer(data)
+func FuzzApiRoundtrip(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		f := fuzz.NewConsumer(data)
 
-	seed := bytesource.New(data)
+		seed := bytesource.New(data)
 
-	scheme := runtime.NewScheme()
-	codecs := serializer.NewCodecFactory(scheme)
-	for _, builder := range groups {
-		err := builder.AddToScheme(scheme)
-		if err != nil {
-			return 0
+		scheme := runtime.NewScheme()
+		codecs := serializer.NewCodecFactory(scheme)
+		for _, builder := range groups {
+			err := builder.AddToScheme(scheme)
+			if err != nil {
+				return
+			}
 		}
-	}
-	fuzzer := fuzzer.FuzzerFor(genericfuzzer.Funcs, seed, codecs)
+		fuzzer := fuzzer.FuzzerFor(genericfuzzer.Funcs, seed, codecs)
 
-	roundtrip.RoundTripExternalTypesAdaLogics(f, t, scheme, codecs, fuzzer, nil)
-	return 1
+		roundtrip.RoundTripExternalTypesAdaLogics(f, t, scheme, codecs, fuzzer, nil)
+		return
+	})
 }
