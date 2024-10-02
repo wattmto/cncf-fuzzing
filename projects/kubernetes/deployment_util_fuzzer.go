@@ -19,9 +19,10 @@ import (
 	"context"
 	apps "k8s.io/api/apps/v1"
 	intstrutil "k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/informers"
+	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/klog/v2"
+	"testing"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
 
@@ -30,126 +31,128 @@ import (
 
 var (
 	functionsToCall = map[int]string {
-		0: "FuzzSetDeploymentCondition",
-		1: "FuzzRemoveDeploymentCondition",
-		2: "FuzzSetDeploymentRevision",
-		3: "FuzzMaxAndLastRevision",
-		4: "FuzzSetNewReplicaSetAnnotations",
-		5: "FuzzSetDeploymentAnnotationsTo",
-		6: "FuzzFindActiveOrLatest",
-		7: "FuzzGetDesiredReplicasAnnotation",
-		8: "FuzzSetReplicasAnnotations",
-		9: "FuzzReplicasAnnotationsNeedUpdate",
-		10: "FuzzMaxUnavailable", 
-		11: "FuzzMinAvailable",
-		12: "FuzzMaxSurge",
-		13: "FuzzGetProportion",
-		14: "FuzzFindNewReplicaSet",
-		15: "FuzzFindOldReplicaSets",
-		16: "FuzzGetReplicaCountForReplicaSets",
-		17: "FuzzGetActualReplicaCountForReplicaSets",
-		18: "FuzzGetReadyReplicaCountForReplicaSets",
-		19: "FuzzGetAvailableReplicaCountForReplicaSets",
-		20: "FuzzNewRSNewReplicas",
-		21: "FuzzIsSaturated",
-		22: "FuzzResolveFenceposts",
-		23: "FuzzGetDeploymentsForReplicaSet", 
+		0: "fuzzSetDeploymentCondition",
+		1: "fuzzRemoveDeploymentCondition",
+		2: "fuzzSetDeploymentRevision",
+		3: "fuzzMaxAndLastRevision",
+		4: "fuzzSetNewReplicaSetAnnotations",
+		5: "fuzzSetDeploymentAnnotationsTo",
+		6: "fuzzFindActiveOrLatest",
+		7: "fuzzGetDesiredReplicasAnnotation",
+		8: "fuzzSetReplicasAnnotations",
+		9: "fuzzReplicasAnnotationsNeedUpdate",
+		10: "fuzzMaxUnavailable",
+		11: "fuzzMinAvailable",
+		12: "fuzzMaxSurge",
+		13: "fuzzGetProportion",
+		14: "fuzzFindNewReplicaSet",
+		15: "fuzzFindOldReplicaSets",
+		16: "fuzzGetReplicaCountForReplicaSets",
+		17: "fuzzGetActualReplicaCountForReplicaSets",
+		18: "fuzzGetReadyReplicaCountForReplicaSets",
+		19: "fuzzGetAvailableReplicaCountForReplicaSets",
+		20: "fuzzNewRSNewReplicas",
+		21: "fuzzIsSaturated",
+		22: "fuzzResolveFenceposts",
+		23: "fuzzGetDeploymentsForReplicaSet",
 	}
 )
 
-func FuzzEntireDeploymentUtil(data []byte) int {
-	if len(data) < 10 {
-		return 0
-	}
-	functionToCall := int(data[0])
-	switch functionsToCall[functionToCall%len(functionsToCall)] {
-	case "FuzzSetDeploymentCondition":
-		return FuzzSetDeploymentCondition(data[1:])
-	case "FuzzRemoveDeploymentCondition":
-		return FuzzRemoveDeploymentCondition(data[1:])
-	case "FuzzSetDeploymentRevision":
-		return FuzzSetDeploymentRevision(data[1:])
-	case "FuzzMaxAndLastRevision":
-		return FuzzMaxAndLastRevision(data[1:])
-	case "FuzzSetNewReplicaSetAnnotations":
-		return FuzzSetNewReplicaSetAnnotations(data[1:])
-	case "FuzzSetDeploymentAnnotationsTo":
-		return FuzzSetDeploymentAnnotationsTo(data[1:])
-	case "FuzzFindActiveOrLatest":
-		return FuzzFindActiveOrLatest(data[1:])
-	case "FuzzGetDesiredReplicasAnnotation":
-		return FuzzGetDesiredReplicasAnnotation(data[1:])
-	case "FuzzSetReplicasAnnotations":
-		return FuzzSetReplicasAnnotations(data[1:])
-	case "FuzzReplicasAnnotationsNeedUpdate":
-		return FuzzReplicasAnnotationsNeedUpdate(data[1:])
-	case "FuzzMaxUnavailable":
-		return FuzzMaxUnavailable(data[1:])
-	case "FuzzMinAvailable":
-		return FuzzMinAvailable(data[1:])
-	case "FuzzMaxSurge":
-		return FuzzMaxSurge(data[1:])
-	case "FuzzGetProportion":
-		return FuzzGetProportion(data[1:])
-	case "FuzzFindNewReplicaSet":
-		return FuzzFindNewReplicaSet(data[1:])
-	case "FuzzFindOldReplicaSets":
-		return FuzzFindOldReplicaSets(data[1:])
-	case "FuzzGetReplicaCountForReplicaSets":
-		return FuzzGetReplicaCountForReplicaSets(data[1:])
-	case "FuzzGetActualReplicaCountForReplicaSets":
-		return FuzzGetActualReplicaCountForReplicaSets(data[1:])
-	case "FuzzGetReadyReplicaCountForReplicaSets":
-		return FuzzGetReadyReplicaCountForReplicaSets(data[1:])
-	case "FuzzGetAvailableReplicaCountForReplicaSets":
-		return FuzzGetAvailableReplicaCountForReplicaSets(data[1:])
-	case "FuzzNewRSNewReplicas":
-		return FuzzNewRSNewReplicas(data[1:])
-	case "FuzzIsSaturated":
-		return FuzzIsSaturated(data[1:])
-	case "FuzzResolveFenceposts":
-		return FuzzResolveFenceposts(data[1:])
-	case "FuzzGetDeploymentsForReplicaSet":
-		return FuzzGetDeploymentsForReplicaSet(data[1:])
-	}
-	return 1
+func FuzzEntireDeploymentUtil(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		if len(data) < 10 {
+			return
+		}
+		functionToCall := int(data[0])
+		switch functionsToCall[functionToCall%len(functionsToCall)] {
+		case "fuzzSetDeploymentCondition":
+			fuzzSetDeploymentCondition(data[1:])
+		case "fuzzRemoveDeploymentCondition":
+			fuzzRemoveDeploymentCondition(data[1:])
+		case "fuzzSetDeploymentRevision":
+			fuzzSetDeploymentRevision(data[1:])
+		case "fuzzMaxAndLastRevision":
+			fuzzMaxAndLastRevision(data[1:])
+		case "fuzzSetNewReplicaSetAnnotations":
+			fuzzSetNewReplicaSetAnnotations(data[1:])
+		case "fuzzSetDeploymentAnnotationsTo":
+			fuzzSetDeploymentAnnotationsTo(data[1:])
+		case "fuzzFindActiveOrLatest":
+			fuzzFindActiveOrLatest(data[1:])
+		case "fuzzGetDesiredReplicasAnnotation":
+			fuzzGetDesiredReplicasAnnotation(data[1:])
+		case "fuzzSetReplicasAnnotations":
+			fuzzSetReplicasAnnotations(data[1:])
+		case "fuzzReplicasAnnotationsNeedUpdate":
+			fuzzReplicasAnnotationsNeedUpdate(data[1:])
+		case "fuzzMaxUnavailable":
+			fuzzMaxUnavailable(data[1:])
+		case "fuzzMinAvailable":
+			fuzzMinAvailable(data[1:])
+		case "fuzzMaxSurge":
+			fuzzMaxSurge(data[1:])
+		case "fuzzGetProportion":
+			fuzzGetProportion(data[1:])
+		case "fuzzFindNewReplicaSet":
+			fuzzFindNewReplicaSet(data[1:])
+		case "fuzzFindOldReplicaSets":
+			fuzzFindOldReplicaSets(data[1:])
+		case "fuzzGetReplicaCountForReplicaSets"
+			fuzzGetReplicaCountForReplicaSets(data[1:])
+		case "fuzzGetActualReplicaCountForReplicaSets":
+			fuzzGetActualReplicaCountForReplicaSets(data[1:])
+		case "fuzzGetReadyReplicaCountForReplicaSets":
+			fuzzGetReadyReplicaCountForReplicaSets(data[1:])
+		case "fuzzGetAvailableReplicaCountForReplicaSets":
+			fuzzGetAvailableReplicaCountForReplicaSets(data[1:])
+		case "fuzzNewRSNewReplicas":
+			fuzzNewRSNewReplicas(data[1:])
+		case "fuzzIsSaturated":
+			fuzzIsSaturated(data[1:])
+		case "fuzzResolveFenceposts":
+			fuzzResolveFenceposts(data[1:])
+		case "fuzzGetDeploymentsForReplicaSet":
+			fuzzGetDeploymentsForReplicaSet(data[1:])
+		}
+		return
+	})
 }
 
-func FuzzSetDeploymentCondition(data []byte) int {
+func fuzzSetDeploymentCondition(data []byte) {
 	// Not supported
-	return 1
+	return
 }
 
-func FuzzRemoveDeploymentCondition(data []byte) int {
+func fuzzRemoveDeploymentCondition(data []byte) {
 	// Not supported
-	return 1
+	return
 }
 
-func FuzzSetDeploymentRevision(data []byte) int {
+func fuzzSetDeploymentRevision(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := &apps.Deployment{}
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	revision, err := f.GetString()
 	if err != nil {
-		return 0
+		return
 	}
 	SetDeploymentRevision(deployment, revision)
-	return 1
+	return
 }
 
-func FuzzMaxAndLastRevision(data []byte) int {
+func fuzzMaxAndLastRevision(data []byte) {
 	f := fuzz.NewConsumer(data)
 	allRSs := make([]*apps.ReplicaSet, 0)
 	err := f.CreateSlice(&allRSs)
 	if err != nil {
-		return 0
+		return
 	}
 	max, err := f.GetBool()
 	if err != nil {
-		return 0
+		return
 	}
 	logger := klog.Background()
 	if max {
@@ -157,317 +160,318 @@ func FuzzMaxAndLastRevision(data []byte) int {
 	} else {
 		LastRevision(logger, allRSs)
 	}
-	return 1
+	return
 }
 
-func FuzzSetNewReplicaSetAnnotations(data []byte) int {
+func fuzzSetNewReplicaSetAnnotations(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := &apps.Deployment{}
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	newRS := &apps.ReplicaSet{}
 	err = f.GenerateStruct(newRS)
 	if err != nil {
-		return 0
+		return
 	}
 	newRevision, err := f.GetString()
 	if err != nil {
-		return 0
+		return
 	}
 	exists, err := f.GetBool()
 	if err != nil {
-		return 0
+		return
 	}
+
 	revHistoryLimitInChars, err := f.GetInt()
 	if err != nil {
-		return 0
+		return
 	}
 	SetNewReplicaSetAnnotations(context.Background(), deployment, newRS, newRevision, exists, revHistoryLimitInChars)
-	return 1
+	return
 }
 
-func FuzzSetDeploymentAnnotationsTo(data []byte) int {
+func fuzzSetDeploymentAnnotationsTo(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := &apps.Deployment{}
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
-	}	
+		return
+	}
 	rollbackToRS := &apps.ReplicaSet{}
 	err = f.GenerateStruct(rollbackToRS)
 	if err != nil {
-		return 0
+		return
 	}
 	SetDeploymentAnnotationsTo(deployment, rollbackToRS)
-	return 1
+	return
 }
 
-func FuzzFindActiveOrLatest(data []byte) int {
+func fuzzFindActiveOrLatest(data []byte) {
 	f := fuzz.NewConsumer(data)
 	newRS := &apps.ReplicaSet{}
 	err := f.GenerateStruct(newRS)
 	if err != nil {
-		return 0
+		return
 	}
 	oldRSs := make([]*apps.ReplicaSet, 0)
 	err = f.CreateSlice(&oldRSs)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = FindActiveOrLatest(newRS, oldRSs)
-	return 1
+	return
 }
 
-func FuzzGetDesiredReplicasAnnotation(data []byte) int {
+func fuzzGetDesiredReplicasAnnotation(data []byte) {
 	f := fuzz.NewConsumer(data)
 	rs := &apps.ReplicaSet{}
 	err := f.GenerateStruct(rs)
 	if err != nil {
-		return 0
+		return
 	}
 	_, _ = GetDesiredReplicasAnnotation(klog.FromContext(context.Background()), rs)
-	return 1
+	return
 }
 
-func FuzzSetReplicasAnnotations(data []byte) int {
+func fuzzSetReplicasAnnotations(data []byte) {
 	f := fuzz.NewConsumer(data)
 	rs := &apps.ReplicaSet{}
 	err := f.GenerateStruct(rs)
 	if err != nil {
-		return 0
+		return
 	}
 	desiredReplicas, err := f.GetInt()
 	if err != nil {
-		return 0
+		return
 	}
 	maxReplicas, err := f.GetInt()
 	if err != nil {
-		return 0
+		return
 	}
 	SetReplicasAnnotations(rs, int32(desiredReplicas), int32(maxReplicas))
-	return 1
+	return
 }
 
-func FuzzReplicasAnnotationsNeedUpdate(data []byte) int {
+func fuzzReplicasAnnotationsNeedUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	rs := &apps.ReplicaSet{}
 	err := f.GenerateStruct(rs)
 	if err != nil {
-		return 0
+		return
 	}
 	desiredReplicas, err := f.GetInt()
 	if err != nil {
-		return 0
+		return
 	}
 	maxReplicas, err := f.GetInt()
 	if err != nil {
-		return 0
+		return
 	}
 	ReplicasAnnotationsNeedUpdate(rs, int32(desiredReplicas), int32(maxReplicas))
-	return 1
+	return
 }
 
-func FuzzMaxUnavailable(data []byte) int {
+func fuzzMaxUnavailable(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := apps.Deployment{}
 	err := f.GenerateStruct(&deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = MaxUnavailable(deployment)
-	return 1
+	return
 }
 
-func FuzzMinAvailable(data []byte) int {
+func fuzzMinAvailable(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := &apps.Deployment{}
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = MinAvailable(deployment)
-	return 1
+	return
 }
 
-func FuzzMaxSurge(data []byte) int {
+func fuzzMaxSurge(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := apps.Deployment{}
 	err := f.GenerateStruct(&deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = MaxSurge(deployment)
-	return 1
+	return
 }
 
-func FuzzGetProportion(data []byte) int {
+func fuzzGetProportion(data []byte) {
 	f := fuzz.NewConsumer(data)
 	rs := &apps.ReplicaSet{}
 	err := f.GenerateStruct(rs)
 	if err != nil {
-		return 0
+		return
 	}
 	deployment := apps.Deployment{}
 	err = f.GenerateStruct(&deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	deploymentReplicasToAdd, err := f.GetInt()
 	if err != nil {
-		return 0
+		return
 	}
 	deploymentReplicasAdded, err := f.GetInt()
 	if err != nil {
-		return 0
+		return
 	}
 	_ = GetProportion(klog.FromContext(context.Background()), rs, deployment, int32(deploymentReplicasToAdd), int32(deploymentReplicasAdded))
-	return 1
+	return
 }
 
-func FuzzFindNewReplicaSet(data []byte) int {
+func fuzzFindNewReplicaSet(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := &apps.Deployment{}
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	rsList := make([]*apps.ReplicaSet, 0)
 	err = f.CreateSlice(&rsList)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = FindNewReplicaSet(deployment, rsList)
-	return 1
+	return
 }
 
-func FuzzFindOldReplicaSets(data []byte) int {
+func fuzzFindOldReplicaSets(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := &apps.Deployment{}
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	rsList := make([]*apps.ReplicaSet, 0)
 	err = f.CreateSlice(&rsList)
 	if err != nil {
-		return 0
+		return
 	}
 	_, _ = FindOldReplicaSets(deployment, rsList)
-	return 1
+	return
 }
 
-func FuzzGetReplicaCountForReplicaSets(data []byte) int {
+func fuzzGetReplicaCountForReplicaSets(data []byte) {
 	f := fuzz.NewConsumer(data)
 	replicaSets := make([]*apps.ReplicaSet, 0)
 	err := f.CreateSlice(&replicaSets)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = GetReplicaCountForReplicaSets(replicaSets)
-	return 1
+	return
 }
 
-func FuzzGetActualReplicaCountForReplicaSets(data []byte) int {
+func fuzzGetActualReplicaCountForReplicaSets(data []byte) {
 	f := fuzz.NewConsumer(data)
 	replicaSets := make([]*apps.ReplicaSet, 0)
 	err := f.CreateSlice(&replicaSets)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = GetActualReplicaCountForReplicaSets(replicaSets)
-	return 1
+	return
 }
 
-func FuzzGetReadyReplicaCountForReplicaSets(data []byte) int {
+func fuzzGetReadyReplicaCountForReplicaSets(data []byte) {
 	f := fuzz.NewConsumer(data)
 	replicaSets := make([]*apps.ReplicaSet, 0)
 	err := f.CreateSlice(&replicaSets)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = GetReadyReplicaCountForReplicaSets(replicaSets)
-	return 1
+	return
 }
 
-func FuzzGetAvailableReplicaCountForReplicaSets(data []byte) int {
+func fuzzGetAvailableReplicaCountForReplicaSets(data []byte) {
 	f := fuzz.NewConsumer(data)
 	replicaSets := make([]*apps.ReplicaSet, 0)
 	err := f.CreateSlice(&replicaSets)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = GetAvailableReplicaCountForReplicaSets(replicaSets)
-	return 1
+	return
 }
 
-func FuzzNewRSNewReplicas(data []byte) int {
+func fuzzNewRSNewReplicas(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := &apps.Deployment{}
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	allRSs := make([]*apps.ReplicaSet, 0)
 	err = f.CreateSlice(&allRSs)
 	if err != nil {
-		return 0
+		return
 	}
 	newRS := &apps.ReplicaSet{}
 	err = f.GenerateStruct(newRS)
 	if err != nil {
-		return 0
+		return
 	}
 	_, _ = NewRSNewReplicas(deployment, allRSs, newRS)
-	return 1
+	return
 }
 
-func FuzzIsSaturated(data []byte) int {
+func fuzzIsSaturated(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment := &apps.Deployment{}
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	rs := &apps.ReplicaSet{}
 	err = f.GenerateStruct(rs)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = IsSaturated(deployment, rs)
-	return 1
+	return
 }
 
-func FuzzResolveFenceposts(data []byte) int {
+func fuzzResolveFenceposts(data []byte) {
 	f := fuzz.NewConsumer(data)
 	maxSurge := &intstrutil.IntOrString{}
 	err := f.GenerateStruct(maxSurge)
 	if err != nil {
-		return 0
+		return
 	}
 	maxUnavailable := &intstrutil.IntOrString{}
 	err = f.GenerateStruct(maxUnavailable)
 	if err != nil {
-		return 0
+		return
 	}
 	desired, err := f.GetInt()
 	if err != nil {
-		return 0
+		return
 	}
 	_, _, _ = ResolveFenceposts(maxSurge, maxUnavailable, int32(desired))
-	return 1
+	return
 }
 
-func FuzzGetDeploymentsForReplicaSet(data []byte) int {
+func fuzzGetDeploymentsForReplicaSet(data []byte) {
 	fakeInformerFactory := informers.NewSharedInformerFactory(&fake.Clientset{}, 0*time.Second)
-	
+
 	f := fuzz.NewConsumer(data)
 	rs := &apps.ReplicaSet{}
 	err := f.GenerateStruct(rs)
 	if err != nil {
-		return 0
+		return
 	}
 	GetDeploymentsForReplicaSet(fakeInformerFactory.Apps().V1().Deployments().Lister(), rs)
-	return 1
+	return
 }
