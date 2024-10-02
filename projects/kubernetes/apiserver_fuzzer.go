@@ -18,6 +18,7 @@ package fuzzing
 import (
 	"encoding/json"
 	"fmt"
+	"testing"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
 
@@ -25,9 +26,11 @@ import (
 	auditpolicy "k8s.io/apiserver/pkg/audit/policy"
 )
 
-func FuzzLoadPolicyFromBytes(data []byte) int {
-	_, _ = auditpolicy.LoadPolicyFromBytes(data)
-	return 1
+func FuzzLoadPolicyFromBytes(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, _ = auditpolicy.LoadPolicyFromBytes(data)
+		return
+	})
 }
 
 // tests https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apiserver/pkg/registry/generic/registry/store_test.go#L386
@@ -41,7 +44,7 @@ func RegistryFuzzer(data []byte) int {
 	if err != nil {
 		return 0
 	}
-	for i:=0;i<noOfDryRyns%30;i++ {
+	for i := 0; i < noOfDryRyns%30; i++ {
 		dr, err := f.GetString()
 		if err != nil {
 			return 0
@@ -49,7 +52,7 @@ func RegistryFuzzer(data []byte) int {
 		dryRuns = append(dryRuns, dr)
 	}
 	in.DryRun = dryRuns
-	
+
 	// set in.Fieldmanager
 	fm, err := f.GetString()
 	if err != nil {
