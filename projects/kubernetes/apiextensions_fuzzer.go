@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"testing"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
 
@@ -55,12 +56,14 @@ func setup2() {
 	}
 }
 
-func FuzzApiServerRoundtrip(data []byte) int {
-	err := apiextensionsRoundtrip(data)
-	if err != nil {
-		panic(err)
-	}
-	return 1
+func FuzzApiServerRoundtrip(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		err := apiextensionsRoundtrip(data)
+		if err != nil {
+			panic(err)
+		}
+		return
+	})
 }
 
 // TestRoundTrip checks the conversion to go-openapi types.
@@ -150,26 +153,28 @@ func newJSONPath(name string, jsonPathExpression string) *jsonpath.JSONPath {
 	return jp
 }
 
-func FuzzConvertToTable(data []byte) int {
-	f := fuzz.NewConsumer(data)
-	crdColumns := createCRCDs(f)
-	if len(crdColumns) == 0 {
-		return 0
-	}
-	c, err := tableconvertor.New(crdColumns)
-	if err != nil {
-		return 0
-	}
-	o, err := getObject(f)
-	if err != nil {
-		return 0
-	}
-	table, err := c.ConvertToTable(context.Background(), o, nil)
-	if err != nil {
-		return 0
-	}
-	_ = table
-	return 1
+func FuzzConvertToTable(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		f := fuzz.NewConsumer(data)
+		crdColumns := createCRCDs(f)
+		if len(crdColumns) == 0 {
+			return
+		}
+		c, err := tableconvertor.New(crdColumns)
+		if err != nil {
+			return
+		}
+		o, err := getObject(f)
+		if err != nil {
+			return
+		}
+		table, err := c.ConvertToTable(context.Background(), o, nil)
+		if err != nil {
+			return
+		}
+		_ = table
+		return
+	})
 }
 
 func createCRCDs(f *fuzz.ConsumeFuzzer) []apiextensionsv1.CustomResourceColumnDefinition {
