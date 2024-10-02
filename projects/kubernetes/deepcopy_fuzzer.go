@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"errors"
 	"reflect"
+	"testing"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
 
@@ -29,31 +30,33 @@ import (
 
 // FuzzDeepCopy implements a fuzzer for the logic defined in:
 // https://github.com/kubernetes/kubernetes/blob/master/pkg/api/testing/copy_test.go
-func FuzzDeepCopy(data []byte) int {
-	f := fuzz.NewConsumer(data)
+func FuzzDeepCopy(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		f := fuzz.NewConsumer(data)
 
-	// get groupversion
-	versionIndex, err := f.GetInt()
-	if err != nil {
-		return 0
-	}
-	groupVersions := []schema.GroupVersion{{Group: "", Version: runtime.APIVersionInternal}, {Group: "", Version: "v1"}}
-	version := groupVersions[versionIndex%len(groupVersions)]
-
-	// pick a kind and do the deepcopy test
-	knownTypes := legacyscheme.Scheme.KnownTypes(version)
-	kindIndex, err := f.GetInt()
-	if err != nil {
-		return 0
-	}
-	kindIndex = kindIndex % len(knownTypes)
-	i := 0
-	for kind := range knownTypes {
-		if i == kindIndex {
-			doDeepCopyTest(version.WithKind(kind), f)
+		// get groupversion
+		versionIndex, err := f.GetInt()
+		if err != nil {
+			return
 		}
-	}
-	return 1
+		groupVersions := []schema.GroupVersion{{Group: "", Version: runtime.APIVersionInternal}, {Group: "", Version: "v1"}}
+		version := groupVersions[versionIndex%len(groupVersions)]
+
+		// pick a kind and do the deepcopy test
+		knownTypes := legacyscheme.Scheme.KnownTypes(version)
+		kindIndex, err := f.GetInt()
+		if err != nil {
+			return
+		}
+		kindIndex = kindIndex % len(knownTypes)
+		i := 0
+		for kind := range knownTypes {
+			if i == kindIndex {
+				doDeepCopyTest(version.WithKind(kind), f)
+			}
+		}
+		return
+	})
 }
 
 func doDeepCopyTest(kind schema.GroupVersionKind, f *fuzz.ConsumeFuzzer) error {
