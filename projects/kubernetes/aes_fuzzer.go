@@ -16,12 +16,13 @@
 package fuzzing
 
 import (
-	stdlibAes "crypto/aes"
 	"context"
+	stdlibAes "crypto/aes"
 	"crypto/cipher"
 	"encoding/hex"
 	"fmt"
 	"reflect"
+	"testing"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
 
@@ -29,43 +30,45 @@ import (
 	aestransformer "k8s.io/apiserver/pkg/storage/value/encrypt/aes"
 )
 
-func FuzzAesRoundtrip(data []byte) int {
-	f := fuzz.NewConsumer(data)
-	cipherBytes, err := f.GetBytes()
-	if err != nil {
-		return 0
-	}
-	if len(cipherBytes) == 0 {
-		return 0
-	}
-
-	randBytes, err := f.GetBytes()
-	if err != nil {
-		return 0
-	}
-	if len(randBytes) == 0 {
-		return 0
-	}
-
-	aesBlock, err := stdlibAes.NewCipher(cipherBytes)
-	if err != nil {
-		return 0
-	}
-
-	callGCMT, err := f.GetBool()
-	if err != nil {
-		return 0
-	}
-	if callGCMT {
-		err = testGCMTTransformer(randBytes, aesBlock)
+func FuzzAesRoundtrip(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		f := fuzz.NewConsumer(data)
+		cipherBytes, err := f.GetBytes()
 		if err != nil {
-			panic(err)
+			return
 		}
-	} else {
-		err = testCBCTransformer(randBytes, aesBlock)
-	}
+		if len(cipherBytes) == 0 {
+			return
+		}
 
-	return 1
+		randBytes, err := f.GetBytes()
+		if err != nil {
+			return
+		}
+		if len(randBytes) == 0 {
+			return
+		}
+
+		aesBlock, err := stdlibAes.NewCipher(cipherBytes)
+		if err != nil {
+			return
+		}
+
+		callGCMT, err := f.GetBool()
+		if err != nil {
+			return
+		}
+		if callGCMT {
+			err = testGCMTTransformer(randBytes, aesBlock)
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			err = testCBCTransformer(randBytes, aesBlock)
+		}
+
+		return
+	})
 }
 
 func testGCMTTransformer(randBytes []byte, aesBlock cipher.Block) error {
