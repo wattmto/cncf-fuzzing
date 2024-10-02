@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"os"
+	"testing"
 	"time"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
@@ -27,51 +28,52 @@ import (
 	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1"
 	apitesting "k8s.io/cri-api/pkg/apis/testing"
 	"k8s.io/cri-client/pkg/logs"
-	"k8s.io/klog/v2"
 )
 
-func FuzzReadLogs(data []byte) int {
-	f := fuzz.NewConsumer(data)
-	logFileBytes, err := f.GetBytes()
-	if err != nil {
-		return 0
-	}
-	logFile, err := os.Create("/tmp/logfile")
-	if err != nil {
-		return 0
-	}
-	defer logFile.Close()
-	_, err = logFile.Write(logFileBytes)
-	if err != nil {
-		return 0
-	}
+func FuzzReadLogs(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		fdp := fuzz.NewConsumer(data)
+		logFileBytes, err := fdp.GetBytes()
+		if err != nil {
+			return
+		}
+		logFile, err := os.Create("/tmp/logfile")
+		if err != nil {
+			return
+		}
+		defer logFile.Close()
+		_, err = logFile.Write(logFileBytes)
+		if err != nil {
+			return
+		}
 
-	containerID := "fake-container-id"
+		containerID := "fake-container-id"
 
-	podLogOptions := &v1.PodLogOptions{}
-	err = f.GenerateStruct(podLogOptions)
-	if err != nil {
-		return 0
-	}
+		podLogOptions := &v1.PodLogOptions{}
+		err = fdp.GenerateStruct(podLogOptions)
+		if err != nil {
+			return
+		}
 
-	fakeRuntimeService := &apitesting.FakeRuntimeService{
-		Containers: map[string]*apitesting.FakeContainer{
-			containerID: {
-				ContainerStatus: runtimeapi.ContainerStatus{
-					State: runtimeapi.ContainerState_CONTAINER_RUNNING,
+		fakeRuntimeService := &apitesting.FakeRuntimeService{
+			Containers: map[string]*apitesting.FakeContainer{
+				containerID: {
+					ContainerStatus: runtimeapi.ContainerStatus{
+						State: runtimeapi.ContainerState_CONTAINER_RUNNING,
+					},
 				},
 			},
-		},
-	}
-	// If follow is specified, mark the container as exited or else ReadLogs will run indefinitely
-	if podLogOptions.Follow {
-		fakeRuntimeService.Containers[containerID].State = runtimeapi.ContainerState_CONTAINER_EXITED
-	}
+		}
+		// If follow is specified, mark the container as exited or else ReadLogs will run indefinitely
+		if podLogOptions.Follow {
+			fakeRuntimeService.Containers[containerID].State = runtimeapi.ContainerState_CONTAINER_EXITED
+		}
 
-	opts := logs.NewLogOptions(podLogOptions, time.Now())
-	stdoutBuf := bytes.NewBuffer(nil)
-	stderrBuf := bytes.NewBuffer(nil)
-	logger := klog.Background()
-	logs.ReadLogs(context.Background(), &logger, "/tmp/logfile", containerID, opts, fakeRuntimeService, stdoutBuf, stderrBuf)
-	return 1
+		opts := logs.NewLogOptions(podLogOptions, time.Now())
+		stdoutBuf := bytes.NewBuffer(nil)
+		stderrBuf := bytes.NewBuffer(nil)
+		logger := klog.Background()
+		logs.ReadLogs(context.Background(), &logger, "/tmp/logfile", containerID, opts, fakeRuntimeService, stdoutBuf, stderrBuf)
+		return
+	})
 }
