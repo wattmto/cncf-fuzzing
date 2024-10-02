@@ -18,6 +18,7 @@ package fuzzing
 import (
 	"fmt"
 	"reflect"
+	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
@@ -45,9 +46,11 @@ type F struct {
 	I []float32         `json:"fi"`
 }
 
-func FuzzUnrecognized(data []byte) int {
-	_ = doUnrecognized(string(data), &F{})
-	return 1
+func FuzzUnrecognized(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_ = doUnrecognized(string(data), &F{})
+		return
+	})
 }
 
 var simpleEquality = conversion.EqualitiesOrDie(
