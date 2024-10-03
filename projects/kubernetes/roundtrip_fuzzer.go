@@ -101,363 +101,365 @@ of the following roundtrip tests:
 - https://github.com/kubernetes/kubernetes/blob/master/pkg/apis/storage/v1/defaults_test.go#L33
 - https://github.com/kubernetes/kubernetes/blob/master/pkg/apis/storage/v1beta1/defaults_test.go#L33
 */
-func FuzzRoundtrip(data []byte) int {
-	if len(data) < 10 {
-		return 0
-	}
-	op := int(data[0])
-	inputData := data[1:]
-	if op%totalFuncs == 0 {
-		return FuzzAppsV1DaemonSet(inputData)
-	} else if op%totalFuncs == 1 {
-		return FuzzAppsV1StatefulSet(inputData)
-	} else if op%totalFuncs == 2 {
-		return FuzzAppsV1Deployment(inputData)
-	} else if op%totalFuncs == 3 {
-		return FuzzAppsV1beta1(inputData)
-	} else if op%totalFuncs == 4 {
-		return FuzzAppsV1beta2StatefulSet(inputData)
-	} else if op%totalFuncs == 5 {
-		return FuzzAppsV1beta2Deployment(inputData)
-	} else if op%totalFuncs == 6 {
-		return FuzzAppsV1beta2ReplicaSet(inputData)
-	} else if op%totalFuncs == 7 {
-		return FuzzAppsV1beta2DaemonSet(inputData)
-	} else if op%totalFuncs == 8 {
-		return FuzzAutoscalingV1HorizontalPodAutoscaler(inputData)
-	} else if op%totalFuncs == 9 {
-		return FuzzAutoscalingV2beta1HorizontalPodAutoscaler(inputData)
-	} else if op%totalFuncs == 10 {
-		return FuzzAutoscalingV2beta2HorizontalPodAutoscaler(inputData)
-	} else if op%totalFuncs == 11 {
-		return FuzzBatchV1Job(inputData)
-	} else if op%totalFuncs == 12 {
-		return FuzzBatchV1CronJob(inputData)
-	} else if op%totalFuncs == 13 {
-		return FuzzBatchV1beta1CronJob(inputData)
-	} else if op%totalFuncs == 14 {
-		return FuzzCoreV1ReplicationController(inputData)
-	} else if op%totalFuncs == 15 {
-		return FuzzCoreV1Pod(inputData)
-	} else if op%totalFuncs == 16 {
-		return FuzzCoreV1Secret(inputData)
-	} else if op%totalFuncs == 17 {
-		return FuzzCoreV1PersistentVolume(inputData)
-	} else if op%totalFuncs == 18 {
-		return FuzzCoreV1PersistentVolumeClaim(inputData)
-	} else if op%totalFuncs == 19 {
-		return FuzzCoreV1Endpoints(inputData)
-	} else if op%totalFuncs == 20 {
-		return FuzzCoreV1Service(inputData)
-	} else if op%totalFuncs == 21 {
-		return FuzzCoreV1Namespace(inputData)
-	} else if op%totalFuncs == 22 {
-		return FuzzCoreV1Node(inputData)
-	} else if op%totalFuncs == 23 {
-		return FuzzCoreV1Endpoints(inputData)
-	} else if op%totalFuncs == 24 {
-		return FuzzCoreV1LimitRange(inputData)
-	} else if op%totalFuncs == 25 {
-		return FuzzExtensionsV1beta1DaemonSet(inputData)
-	} else if op%totalFuncs == 26 {
-		return FuzzExtensionsV1beta1Deployment(inputData)
-	} else if op%totalFuncs == 27 {
-		return FuzzExtensionsV1beta1ReplicaSet(inputData)
-	} else if op%totalFuncs == 28 {
-		return FuzzExtensionsV1beta1NetworkPolicy(inputData)
-	} else if op%totalFuncs == 29 {
-		return FuzzNetworkingV1NetworkPolicy(inputData)
-	} else if op%totalFuncs == 30 {
-		return FuzzNetworkingV1IngressClass(inputData)
-	} else if op%totalFuncs == 31 {
-		return FuzzNetworkingV1beta1Ingress(inputData)
-	} else if op%totalFuncs == 32 {
-		return FuzzSchedulingV1PriorityClass(inputData)
-	} else if op%totalFuncs == 33 {
-		return FuzzSchedulingV1alpa1PriorityClass(inputData)
-	} else if op%totalFuncs == 34 {
-		return FuzzSchedulingV1beta1PriorityClass(inputData)
-	} else if op%totalFuncs == 35 {
-		return FuzzStorageV1CSIDriver(inputData)
-	} else if op%totalFuncs == 36 {
-		return FuzzStorageV1StorageClass(inputData)
-	} else if op%totalFuncs == 37 {
-		return FuzzStorageV1beta1CSIDriver(inputData)
-	} else if op%totalFuncs == 38 {
-		return FuzzStorageV1beta1StorageClass(inputData)
-	}
-	return 1
+func FuzzRoundtrip(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		if len(data) < 10 {
+			return
+		}
+		op := int(data[0])
+		inputData := data[1:]
+		if op%totalFuncs == 0 {
+			fuzzAppsV1DaemonSet(inputData)
+		} else if op%totalFuncs == 1 {
+			fuzzAppsV1StatefulSet(inputData)
+		} else if op%totalFuncs == 2 {
+			fuzzAppsV1Deployment(inputData)
+		} else if op%totalFuncs == 3 {
+			fuzzAppsV1beta1(inputData)
+		} else if op%totalFuncs == 4 {
+			fuzzAppsV1beta2StatefulSet(inputData)
+		} else if op%totalFuncs == 5 {
+			fuzzAppsV1beta2Deployment(inputData)
+		} else if op%totalFuncs == 6 {
+			fuzzAppsV1beta2ReplicaSet(inputData)
+		} else if op%totalFuncs == 7 {
+			fuzzAppsV1beta2DaemonSet(inputData)
+		} else if op%totalFuncs == 8 {
+			fuzzAutoscalingV1HorizontalPodAutoscaler(inputData)
+		} else if op%totalFuncs == 9 {
+			fuzzAutoscalingV2beta1HorizontalPodAutoscaler(inputData)
+		} else if op%totalFuncs == 10 {
+			fuzzAutoscalingV2beta2HorizontalPodAutoscaler(inputData)
+		} else if op%totalFuncs == 11 {
+			fuzzBatchV1Job(inputData)
+		} else if op%totalFuncs == 12 {
+			fuzzBatchV1CronJob(inputData)
+		} else if op%totalFuncs == 13 {
+			fuzzBatchV1beta1CronJob(inputData)
+		} else if op%totalFuncs == 14 {
+			fuzzCoreV1ReplicationController(inputData)
+		} else if op%totalFuncs == 15 {
+			fuzzCoreV1Pod(inputData)
+		} else if op%totalFuncs == 16 {
+			fuzzCoreV1Secret(inputData)
+		} else if op%totalFuncs == 17 {
+			fuzzCoreV1PersistentVolume(inputData)
+		} else if op%totalFuncs == 18 {
+			fuzzCoreV1PersistentVolumeClaim(inputData)
+		} else if op%totalFuncs == 19 {
+			fuzzCoreV1Endpoints(inputData)
+		} else if op%totalFuncs == 20 {
+			fuzzCoreV1Service(inputData)
+		} else if op%totalFuncs == 21 {
+			fuzzCoreV1Namespace(inputData)
+		} else if op%totalFuncs == 22 {
+			fuzzCoreV1Node(inputData)
+		} else if op%totalFuncs == 23 {
+			fuzzCoreV1Endpoints(inputData)
+		} else if op%totalFuncs == 24 {
+			fuzzCoreV1LimitRange(inputData)
+		} else if op%totalFuncs == 25 {
+			fuzzExtensionsV1beta1DaemonSet(inputData)
+		} else if op%totalFuncs == 26 {
+			fuzzExtensionsV1beta1Deployment(inputData)
+		} else if op%totalFuncs == 27 {
+			fuzzExtensionsV1beta1ReplicaSet(inputData)
+		} else if op%totalFuncs == 28 {
+			fuzzExtensionsV1beta1NetworkPolicy(inputData)
+		} else if op%totalFuncs == 29 {
+			fuzzNetworkingV1NetworkPolicy(inputData)
+		} else if op%totalFuncs == 30 {
+			fuzzNetworkingV1IngressClass(inputData)
+		} else if op%totalFuncs == 31 {
+			fuzzNetworkingV1beta1Ingress(inputData)
+		} else if op%totalFuncs == 32 {
+			fuzzSchedulingV1PriorityClass(inputData)
+		} else if op%totalFuncs == 33 {
+			fuzzSchedulingV1alpa1PriorityClass(inputData)
+		} else if op%totalFuncs == 34 {
+			fuzzSchedulingV1beta1PriorityClass(inputData)
+		} else if op%totalFuncs == 35 {
+			fuzzStorageV1CSIDriver(inputData)
+		} else if op%totalFuncs == 36 {
+			fuzzStorageV1StorageClass(inputData)
+		} else if op%totalFuncs == 37 {
+			fuzzStorageV1beta1CSIDriver(inputData)
+		} else if op%totalFuncs == 38 {
+			fuzzStorageV1beta1StorageClass(inputData)
+		}
+		return
+	})
 }
 
-func FuzzAppsV1DaemonSet(data []byte) int {
+func fuzzAppsV1DaemonSet(data []byte) {
 	o := &appsv1.DaemonSet{}
 	sgv := appsv1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAppsV1StatefulSet(data []byte) int {
+func fuzzAppsV1StatefulSet(data []byte) {
 	o := &appsv1.StatefulSet{}
 	sgv := appsv1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAppsV1Deployment(data []byte) int {
+func fuzzAppsV1Deployment(data []byte) {
 	o := &appsv1.Deployment{}
 	sgv := appsv1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAppsV1beta1(data []byte) int {
+func fuzzAppsV1beta1(data []byte) {
 	o := &appsv1beta1.Deployment{}
 	sgv := appsv1beta1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAppsV1beta2StatefulSet(data []byte) int {
+func fuzzAppsV1beta2StatefulSet(data []byte) {
 	o := &appsv1beta2.StatefulSet{}
 	sgv := appsv1beta2SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAppsV1beta2Deployment(data []byte) int {
+func fuzzAppsV1beta2Deployment(data []byte) {
 	o := &appsv1beta2.Deployment{}
 	sgv := appsv1beta2SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAppsV1beta2ReplicaSet(data []byte) int {
+func fuzzAppsV1beta2ReplicaSet(data []byte) {
 	o := &appsv1beta2.ReplicaSet{}
 	sgv := appsv1beta2SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAppsV1beta2DaemonSet(data []byte) int {
+func fuzzAppsV1beta2DaemonSet(data []byte) {
 	o := &appsv1beta2.DaemonSet{}
 	sgv := appsv1beta2SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAutoscalingV1HorizontalPodAutoscaler(data []byte) int {
+func fuzzAutoscalingV1HorizontalPodAutoscaler(data []byte) {
 	o := &autoscalingv1.HorizontalPodAutoscaler{}
 	sgv := autoscalingV1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAutoscalingV2beta1HorizontalPodAutoscaler(data []byte) int {
+func fuzzAutoscalingV2beta1HorizontalPodAutoscaler(data []byte) {
 	o := &autoscalingv2beta1.HorizontalPodAutoscaler{}
 	sgv := autoscalingV2beta1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzAutoscalingV2beta2HorizontalPodAutoscaler(data []byte) int {
+func fuzzAutoscalingV2beta2HorizontalPodAutoscaler(data []byte) {
 	o := &autoscalingv2.HorizontalPodAutoscaler{}
 	sgv := autoscalingV2beta2SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzBatchV1Job(data []byte) int {
+func fuzzBatchV1Job(data []byte) {
 	o := &batchv1.Job{}
 	sgv := batchV1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzBatchV1CronJob(data []byte) int {
+func fuzzBatchV1CronJob(data []byte) {
 	o := &batchv1.CronJob{}
 	sgv := batchV1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
 // Scheme IS registered
-func FuzzBatchV1beta1CronJob(data []byte) int {
+func fuzzBatchV1beta1CronJob(data []byte) {
 	o := &batchv1beta1.CronJob{}
 	sgv := batchV1beta1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1ReplicationController(data []byte) int {
+func fuzzCoreV1ReplicationController(data []byte) {
 	o := &v1.ReplicationController{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1Pod(data []byte) int {
+func fuzzCoreV1Pod(data []byte) {
 	o := &v1.Pod{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1Secret(data []byte) int {
+func fuzzCoreV1Secret(data []byte) {
 	o := &v1.Secret{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1PersistentVolume(data []byte) int {
+func fuzzCoreV1PersistentVolume(data []byte) {
 	o := &v1.PersistentVolume{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1PersistentVolumeClaim(data []byte) int {
+func fuzzCoreV1PersistentVolumeClaim(data []byte) {
 	o := &v1.PersistentVolumeClaim{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1Endpoints(data []byte) int {
+func fuzzCoreV1Endpoints(data []byte) {
 	o := &v1.Endpoints{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1Service(data []byte) int {
+func fuzzCoreV1Service(data []byte) {
 	o := &v1.Service{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1Namespace(data []byte) int {
+func fuzzCoreV1Namespace(data []byte) {
 	o := &v1.Namespace{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1Node(data []byte) int {
+func fuzzCoreV1Node(data []byte) {
 	o := &v1.Node{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzCoreV1LimitRange(data []byte) int {
+func fuzzCoreV1LimitRange(data []byte) {
 	o := &v1.LimitRange{}
 	sgv := corev1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzExtensionsV1beta1DaemonSet(data []byte) int {
+func fuzzExtensionsV1beta1DaemonSet(data []byte) {
 	o := &extensionsv1beta1.DaemonSet{}
 	sgv := extensionsV1beta1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzExtensionsV1beta1Deployment(data []byte) int {
+func fuzzExtensionsV1beta1Deployment(data []byte) {
 	o := &extensionsv1beta1.Deployment{}
 	sgv := extensionsV1beta1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzExtensionsV1beta1ReplicaSet(data []byte) int {
+func fuzzExtensionsV1beta1ReplicaSet(data []byte) {
 	o := &extensionsv1beta1.ReplicaSet{}
 	sgv := extensionsV1beta1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzExtensionsV1beta1NetworkPolicy(data []byte) int {
+func fuzzExtensionsV1beta1NetworkPolicy(data []byte) {
 	o := &extensionsv1beta1.NetworkPolicy{}
 	sgv := extensionsV1beta1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzNetworkingV1NetworkPolicy(data []byte) int {
+func fuzzNetworkingV1NetworkPolicy(data []byte) {
 	o := &networkingv1.NetworkPolicy{}
 	sgv := networkingV1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzNetworkingV1IngressClass(data []byte) int {
+func fuzzNetworkingV1IngressClass(data []byte) {
 	o := &networkingv1.IngressClass{}
 	sgv := networkingV1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzNetworkingV1beta1Ingress(data []byte) int {
+func fuzzNetworkingV1beta1Ingress(data []byte) {
 	o := &networkingv1beta1.Ingress{}
 	sgv := networkingV1beta1SGV.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzSchedulingV1PriorityClass(data []byte) int {
+func fuzzSchedulingV1PriorityClass(data []byte) {
 	o := &schedulingv1.PriorityClass{}
 	sgv := schedulingv1.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzSchedulingV1alpa1PriorityClass(data []byte) int {
+func fuzzSchedulingV1alpa1PriorityClass(data []byte) {
 	o := &schedulingv1alpha1.PriorityClass{}
 	sgv := schedulingv1alpha1.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzSchedulingV1beta1PriorityClass(data []byte) int {
+func fuzzSchedulingV1beta1PriorityClass(data []byte) {
 	o := &schedulingv1beta1.PriorityClass{}
 	sgv := schedulingv1beta1.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzStorageV1CSIDriver(data []byte) int {
+func fuzzStorageV1CSIDriver(data []byte) {
 	initLocalTest.Do(initTesting)
 	o := &storagev1.CSIDriver{}
 	sgv := storagev1.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzStorageV1StorageClass(data []byte) int {
+func fuzzStorageV1StorageClass(data []byte) {
 	initLocalTest.Do(initTesting)
 	o := &storagev1.StorageClass{}
 	sgv := storagev1.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzStorageV1beta1CSIDriver(data []byte) int {
+func fuzzStorageV1beta1CSIDriver(data []byte) {
 	initLocalTest.Do(initTesting)
 	o := &storagev1beta1.CSIDriver{}
 	sgv := storagev1beta1.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
-func FuzzStorageV1beta1StorageClass(data []byte) int {
+func fuzzStorageV1beta1StorageClass(data []byte) {
 	initLocalTest.Do(initTesting)
 	o := &storagev1beta1.StorageClass{}
 	sgv := storagev1beta1.SchemeGroupVersion
 	prepAndDoRoundtrip(sgv, o, data)
-	return 1
+	return
 }
 
 func prepAndDoRoundtrip(sgv schema.GroupVersion, o runtime.Object, data []byte) error {
