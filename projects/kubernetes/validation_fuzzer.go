@@ -18,6 +18,7 @@ package fuzzing
 import (
 	"context"
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
+	"testing"
 
 	v1 "k8s.io/api/core/v1"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
@@ -49,354 +50,341 @@ import (
 
 const maxFuzzers = 50
 
-func FuzzAllValidation(data []byte) int {
-	if len(data) < 10 {
-		return 0
-	}
-	op := int(data[0]) % maxFuzzers
-	inputData := data[1:]
-	if op == 0 {
-		return FuzzValidatePodCreate(inputData)
-	} else if op == 1 {
-		return FuzzValidatePodUpdate(inputData)
-	} else if op == 2 {
-		return FuzzValidatePodStatusUpdate(inputData)
-	} else if op == 3 {
-		return FuzzValidatePodEphemeralContainersUpdate(inputData)
-	} else if op == 4 {
-		return FuzzValidatePersistentVolumeUpdate(inputData)
-	} else if op == 5 {
-		return FuzzValidatePersistentVolumeClaimUpdate(inputData)
-	} else if op == 6 {
-		return FuzzValidateServiceCreate(inputData)
-	} else if op == 7 {
-		return FuzzValidateServiceUpdate(inputData)
-	} else if op == 8 {
-		return FuzzValidateEndpointsCreate(inputData)
-	} else if op == 9 {
-		return FuzzValidateNodeUpdate(inputData)
-	} else if op == 10 {
-		return FuzzValidateLimitRange(inputData)
-	} else if op == 11 {
-		return FuzzValidateStatefulSet(inputData)
-	} else if op == 12 {
-		return FuzzValidateStatefulSetUpdate(inputData)
-	} else if op == 13 {
-		return FuzzValidateDaemonSet(inputData)
-	} else if op == 14 {
-		return FuzzValidateDaemonSetUpdate(inputData)
-	} else if op == 15 {
-		return FuzzValidateDeployment(inputData)
-	} else if op == 16 {
-		return FuzzValidateDeploymentUpdate(inputData)
-	} else if op == 17 {
-		return FuzzValidateJob(inputData)
-	} else if op == 18 {
-		return FuzzValidateJobUpdate(inputData)
-	} else if op == 19 {
-		return FuzzValidateCronJobCreate(inputData)
-	} else if op == 20 {
-		return FuzzValidateCronJobUpdate(inputData)
-	} else if op == 21 {
-		return FuzzValidateScale(inputData)
-	} else if op == 22 {
-		return FuzzValidateHorizontalPodAutoscaler(inputData)
-	} else if op == 23 {
-		return FuzzValidateHorizontalPodAutoscalerUpdate(inputData)
-	} else if op == 24 {
-		return FuzzValidateDeployment(inputData)
-	} else if op == 25 {
-		return FuzzValidatePodDisruptionBudget(inputData)
-	} else if op == 26 {
-		return FuzzValidatePodDisruptionBudgetStatusUpdate(inputData)
-	} else if op == 31 {
-		return FuzzValidateCertificateSigningRequestCreate(inputData)
-	} else if op == 32 {
-		return FuzzValidateCertificateSigningRequestUpdate(inputData)
-	} else if op == 33 {
-		return FuzzValidateCertificateSigningRequestStatusUpdate(inputData)
-	} else if op == 34 {
-		return FuzzValidateCertificateSigningRequestApprovalUpdate(inputData)
-	} else if op == 35 {
-		return FuzzValidateCustomResourceDefinition(inputData)
-	} else if op == 36 {
-		return FuzzValidateStorageVersion(inputData)
-	} else if op == 37 {
-		return FuzzValidateStorageVersionName(inputData)
-	} else if op == 38 {
-		return FuzzValidateStorageVersionStatusUpdate(inputData)
-	} else if op == 39 {
-		return FuzzValidatePolicy(inputData)
-	} else if op == 40 {
-		return FuzzLoadPolicyFromBytes(inputData)
-	} else if op == 41 {
-		return FuzzValidateRoleUpdate(inputData)
-	} else if op == 42 {
-		return FuzzValidateClusterRoleUpdate(inputData)
-	} else if op == 43 {
-		return FuzzValidateRoleBindingUpdate(inputData)
-	} else if op == 44 {
-		return FuzzValidateClusterRoleBindingUpdate(inputData)
-	} else if op == 45 {
-		return FuzzCompactRules(inputData)
-	} else if op == 46 {
-		return FuzzValidateResourceQuotaSpec(inputData)
-	} else if op == 47 {
-		return FuzzValidateResourceQuotaUpdate(inputData)
-	} else if op == 48 {
-		FuzzValidateResourceQuotaStatusUpdate(inputData)
-	} else if op == 49 {
-		FuzzValidateServiceStatusUpdate(inputData)
-	}
-	return 0
+func FuzzAllValidation(f *testing.F) {
+	f.Fuzz(func(t *testing.T, data []byte) {
+		if len(data) < 10 {
+			return
+		}
+		op := int(data[0]) % maxFuzzers
+		inputData := data[1:]
+		if op == 0 {
+			fuzzValidatePodCreate(inputData)
+		} else if op == 1 {
+			fuzzValidatePodUpdate(inputData)
+		} else if op == 2 {
+			fuzzValidatePodStatusUpdate(inputData)
+		} else if op == 3 {
+			fuzzValidatePodEphemeralContainersUpdate(inputData)
+		} else if op == 4 {
+			fuzzValidatePersistentVolumeUpdate(inputData)
+		} else if op == 5 {
+			fuzzValidatePersistentVolumeClaimUpdate(inputData)
+		} else if op == 6 {
+			fuzzValidateServiceCreate(inputData)
+		} else if op == 7 {
+			fuzzValidateServiceUpdate(inputData)
+		} else if op == 8 {
+			fuzzValidateEndpointsCreate(inputData)
+		} else if op == 9 {
+			fuzzValidateNodeUpdate(inputData)
+		} else if op == 10 {
+			fuzzValidateLimitRange(inputData)
+		} else if op == 11 {
+			fuzzValidateStatefulSet(inputData)
+		} else if op == 12 {
+			fuzzValidateStatefulSetUpdate(inputData)
+		} else if op == 13 {
+			fuzzValidateDaemonSet(inputData)
+		} else if op == 14 {
+			fuzzValidateDaemonSetUpdate(inputData)
+		} else if op == 15 {
+			fuzzValidateDeployment(inputData)
+		} else if op == 16 {
+			fuzzValidateDeploymentUpdate(inputData)
+		} else if op == 17 {
+			fuzzValidateJob(inputData)
+		} else if op == 18 {
+			fuzzValidateJobUpdate(inputData)
+		} else if op == 19 {
+			fuzzValidateCronJobCreate(inputData)
+		} else if op == 20 {
+			fuzzValidateCronJobUpdate(inputData)
+		} else if op == 21 {
+			fuzzValidateScale(inputData)
+		} else if op == 22 {
+			fuzzValidateHorizontalPodAutoscaler(inputData)
+		} else if op == 23 {
+			fuzzValidateHorizontalPodAutoscalerUpdate(inputData)
+		} else if op == 24 {
+			fuzzValidateDeployment(inputData)
+		} else if op == 25 {
+			fuzzValidatePodDisruptionBudget(inputData)
+		} else if op == 26 {
+			fuzzValidatePodDisruptionBudgetStatusUpdate(inputData)
+		} else if op == 31 {
+			fuzzValidateCertificateSigningRequestCreate(inputData)
+		} else if op == 32 {
+			fuzzValidateCertificateSigningRequestUpdate(inputData)
+		} else if op == 33 {
+			fuzzValidateCertificateSigningRequestStatusUpdate(inputData)
+		} else if op == 34 {
+			fuzzValidateCertificateSigningRequestApprovalUpdate(inputData)
+		} else if op == 35 {
+			fuzzValidateCustomResourceDefinition(inputData)
+		} else if op == 36 {
+			fuzzValidateStorageVersion(inputData)
+		} else if op == 37 {
+			fuzzValidateStorageVersionName(inputData)
+		} else if op == 38 {
+			fuzzValidateStorageVersionStatusUpdate(inputData)
+		} else if op == 39 {
+			fuzzValidatePolicy(inputData)
+		} else if op == 40 {
+			FuzzLoadPolicyFromBytes(inputData)
+		} else if op == 41 {
+			fuzzValidateRoleUpdate(inputData)
+		} else if op == 42 {
+			fuzzValidateClusterRoleUpdate(inputData)
+		} else if op == 43 {
+			fuzzValidateRoleBindingUpdate(inputData)
+		} else if op == 44 {
+			fuzzValidateClusterRoleBindingUpdate(inputData)
+		} else if op == 45 {
+			fuzzCompactRules(inputData)
+		} else if op == 46 {
+			fuzzValidateResourceQuotaSpec(inputData)
+		} else if op == 47 {
+			fuzzValidateResourceQuotaUpdate(inputData)
+		} else if op == 48 {
+			fuzzValidateResourceQuotaStatusUpdate(inputData)
+		} else if op == 49 {
+			fuzzValidateServiceStatusUpdate(inputData)
+		}
+		return
+	})
 }
 
 //// Pod validation
 
-func FuzzValidatePodCreate(data []byte) int {
+func fuzzValidatePodCreate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	pod := &core.Pod{}
 	err := f.GenerateStruct(pod)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := validation.ValidatePodCreate(pod, validation.PodValidationOptions{}); len(errs) > 0 {
-		return 0
+		return
 	}
 
 	// Now test conversion
 	v1Pod := &v1.Pod{}
 	_ = k8s_api_v1.Convert_core_Pod_To_v1_Pod(pod, v1Pod, nil)
-	return 1
+	return
 }
 
-func FuzzValidatePodUpdate(data []byte) int {
+func fuzzValidatePodUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	pod1 := &core.Pod{}
 	err := f.GenerateStruct(pod1)
 	if err != nil {
-		return 0
+		return
 	}
 	pod2 := &core.Pod{}
 	err = f.GenerateStruct(pod2)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = validation.ValidatePodUpdate(pod1, pod2, validation.PodValidationOptions{})
-	return 1
+	return
 }
 
-func FuzzValidatePodStatusUpdate(data []byte) int {
+func fuzzValidatePodStatusUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	pod1 := &core.Pod{}
 	err := f.GenerateStruct(pod1)
 	if err != nil {
-		return 0
+		return
 	}
 	pod2 := &core.Pod{}
 	err = f.GenerateStruct(pod2)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = validation.ValidatePodStatusUpdate(pod1, pod2, validation.PodValidationOptions{})
-	return 1
+	return
 }
 
-func FuzzValidatePodEphemeralContainersUpdate(data []byte) int {
+func fuzzValidatePodEphemeralContainersUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	pod1 := &core.Pod{}
 	err := f.GenerateStruct(pod1)
 	if err != nil {
-		return 0
+		return
 	}
 	pod2 := &core.Pod{}
 	err = f.GenerateStruct(pod2)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = validation.ValidatePodEphemeralContainersUpdate(pod1, pod2, validation.PodValidationOptions{})
-	return 1
+	return
 }
 
 // Persistent volume validation
 
-func FuzzValidatePersistentVolumeUpdate(data []byte) int {
+func fuzzValidatePersistentVolumeUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	pv1 := &core.PersistentVolume{}
 	err := f.GenerateStruct(pv1)
 	if err != nil {
-		return 0
+		return
 	}
 	pv2 := &core.PersistentVolume{}
 	err = f.GenerateStruct(pv2)
 	if err != nil {
-		return 0
+		return
 	}
 	opts := validation.PersistentVolumeSpecValidationOptions{}
 	_ = validation.ValidatePersistentVolumeUpdate(pv1, pv2, opts)
-	return 1
+	return
 }
 
 // Persistent Volume clain validation
 
-func FuzzValidatePersistentVolumeClaimUpdate(data []byte) int {
+func fuzzValidatePersistentVolumeClaimUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	pvc1 := &core.PersistentVolumeClaim{}
 	err := f.GenerateStruct(pvc1)
 	if err != nil {
-		return 0
+		return
 	}
 	pvc2 := &core.PersistentVolumeClaim{}
 	err = f.GenerateStruct(pvc2)
 	if err != nil {
-		return 0
+		return
 	}
 	opts := validation.PersistentVolumeClaimSpecValidationOptions{}
 	_ = validation.ValidatePersistentVolumeClaimUpdate(pvc1, pvc2, opts)
-	return 1
+	return
 }
 
 //// Service validation
 
-func FuzzValidateServiceCreate(data []byte) int {
+func fuzzValidateServiceCreate(data []byte) {
 	service := &core.Service{}
 	f := fuzz.NewConsumer(data)
 	err := f.GenerateStruct(service)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = validation.ValidateServiceCreate(service)
-	return 1
+	return
 }
 
-func FuzzValidateServiceUpdate(data []byte) int {
+func fuzzValidateServiceUpdate(data []byte) {
 	service1 := &core.Service{}
 	f := fuzz.NewConsumer(data)
 	err := f.GenerateStruct(service1)
 	if err != nil {
-		return 0
+		return
 	}
 	service2 := &core.Service{}
 	err = f.GenerateStruct(service2)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = validation.ValidateServiceUpdate(service1, service2)
-	return 1
+	return
 }
 
 //// Endpoints validation
 
-func FuzzValidateEndpointsCreate(data []byte) int {
+func fuzzValidateEndpointsCreate(data []byte) {
 	endpoints := &core.Endpoints{}
 	f := fuzz.NewConsumer(data)
 	err := f.GenerateStruct(endpoints)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = validation.ValidateEndpointsCreate(endpoints)
-	return 1
+	return
 }
 
 // Node validation
 
-func FuzzValidateNodeUpdate(data []byte) int {
+func fuzzValidateNodeUpdate(data []byte) {
 	node1 := &core.Node{}
 	f := fuzz.NewConsumer(data)
 	err := f.GenerateStruct(node1)
 	if err != nil {
-		return 0
+		return
 	}
 	node2 := &core.Node{}
 	err = f.GenerateStruct(node2)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = validation.ValidateNodeUpdate(node1, node2)
-	return 1
+	return
 }
 
 // Limit Range validation
 
-func FuzzValidateLimitRange(data []byte) int {
+func fuzzValidateLimitRange(data []byte) {
 	limitRange := &core.LimitRange{}
 	f := fuzz.NewConsumer(data)
 	err := f.GenerateStruct(limitRange)
 	if err != nil {
-		return 0
+		return
 	}
 	_ = validation.ValidateLimitRange(limitRange)
-	return 1
+	return
 }
 
 // apps validation
 
-func FuzzValidateStatefulSet(data []byte) int {
-	//fmt.Println("Calling FuzzValidateStatefulSet")
+func fuzzValidateStatefulSet(data []byte) {
 	statefulset := &apps.StatefulSet{}
 	f := fuzz.NewConsumer(data)
 	err := f.GenerateStruct(statefulset)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := appsValidation.ValidateStatefulSet(statefulset, validation.PodValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateStatefulSetUpdate(data []byte) int {
-	//fmt.Println("Calling FuzzValidateStatefulSetUpdate")
+func fuzzValidateStatefulSetUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	statefulset1 := &apps.StatefulSet{}
 	err := f.GenerateStruct(statefulset1)
 	if err != nil {
-		return 0
+		return
 	}
 	statefulset2 := &apps.StatefulSet{}
 	err = f.GenerateStruct(statefulset2)
 	if err != nil {
-		return 0
+		return
 	}
 	opts := validation.PodValidationOptions{}
 	err = f.GenerateStruct(&opts)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := appsValidation.ValidateStatefulSetUpdate(statefulset1, statefulset2, opts); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateDaemonSet(data []byte) int {
-	//fmt.Println("Calling FuzzValidateDaemonSet")
+func fuzzValidateDaemonSet(data []byte) {
 	daemonset := &apps.DaemonSet{}
 	f := fuzz.NewConsumer(data)
 	err := f.GenerateStruct(daemonset)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := appsValidation.ValidateDaemonSet(daemonset, validation.PodValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateDaemonSetUpdate(data []byte) int {
-	//fmt.Println("Calling FuzzValidateDaemonSetUpdate")
+func fuzzValidateDaemonSetUpdate(data []byte) int {
+	//fmt.Println("Calling fuzzValidateDaemonSetUpdate")
 	f := fuzz.NewConsumer(data)
 	daemonset1 := &apps.DaemonSet{}
 	err := f.GenerateStruct(daemonset1)
@@ -418,501 +406,476 @@ func FuzzValidateDaemonSetUpdate(data []byte) int {
 	return 1
 }
 
-func FuzzValidateDeployment(data []byte) int {
-	//fmt.Println("Calling FuzzValidateDeployment")
+func fuzzValidateDeployment(data []byte) {
 	deployment := &apps.Deployment{}
 	f := fuzz.NewConsumer(data)
 	err := f.GenerateStruct(deployment)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := appsValidation.ValidateDeployment(deployment, validation.PodValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateDeploymentUpdate(data []byte) int {
-	//fmt.Println("Calling FuzzValidateDeploymentUpdate")
+func fuzzValidateDeploymentUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	deployment1 := &apps.Deployment{}
 	err := f.GenerateStruct(deployment1)
 	if err != nil {
-		return 0
+		return
 	}
 	deployment2 := &apps.Deployment{}
 	err = f.GenerateStruct(deployment2)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := appsValidation.ValidateDeploymentUpdate(deployment1, deployment2, validation.PodValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			//fmt.Println(err)
-			_ = err
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
 // batch validation
 
-func FuzzValidateJob(data []byte) int {
+func fuzzValidateJob(data []byte) {
 	f := fuzz.NewConsumer(data)
 	job := &batch.Job{}
 	err := f.GenerateStruct(job)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := batchValidation.ValidateJob(job, batchValidation.JobValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateJobUpdate(data []byte) int {
+func fuzzValidateJobUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	job1 := &batch.Job{}
 	err := f.GenerateStruct(job1)
 	if err != nil {
-		return 0
+		return
 	}
 	job2 := &batch.Job{}
 	err = f.GenerateStruct(job2)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := batchValidation.ValidateJobUpdate(job1, job2, batchValidation.JobValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateCronJobCreate(data []byte) int {
+func fuzzValidateCronJobCreate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	cronjob := &batch.CronJob{}
 	err := f.GenerateStruct(cronjob)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := batchValidation.ValidateCronJobCreate(cronjob, validation.PodValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateCronJobUpdate(data []byte) int {
+func fuzzValidateCronJobUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	cronjob1 := &batch.CronJob{}
 	err := f.GenerateStruct(cronjob1)
 	if err != nil {
-		return 0
+		return
 	}
 	cronjob2 := &batch.CronJob{}
 	err = f.GenerateStruct(cronjob2)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := batchValidation.ValidateCronJobUpdate(cronjob1, cronjob2, validation.PodValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
 // autoscaling validation
 
-func FuzzValidateScale(data []byte) int {
+func fuzzValidateScale(data []byte) {
 	f := fuzz.NewConsumer(data)
 	scale := &autoscaling.Scale{}
 	err := f.GenerateStruct(scale)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := autoscalingValidation.ValidateScale(scale); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateHorizontalPodAutoscaler(data []byte) int {
+func fuzzValidateHorizontalPodAutoscaler(data []byte) {
 	f := fuzz.NewConsumer(data)
 	autoscaler := &autoscaling.HorizontalPodAutoscaler{}
 	err := f.GenerateStruct(autoscaler)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := autoscalingValidation.ValidateHorizontalPodAutoscaler(autoscaler); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidateHorizontalPodAutoscalerUpdate(data []byte) int {
+func fuzzValidateHorizontalPodAutoscalerUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	autoscaler1 := &autoscaling.HorizontalPodAutoscaler{}
 	err := f.GenerateStruct(autoscaler1)
 	if err != nil {
-		return 0
+		return
 	}
 	autoscaler2 := &autoscaling.HorizontalPodAutoscaler{}
 	err = f.GenerateStruct(autoscaler2)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := autoscalingValidation.ValidateHorizontalPodAutoscalerUpdate(autoscaler1, autoscaler2); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
 // policy validation
 
-func FuzzValidatePodDisruptionBudget(data []byte) int {
+func fuzzValidatePodDisruptionBudget(data []byte) {
 	f := fuzz.NewConsumer(data)
 	pdb := &policy.PodDisruptionBudget{}
 	err := f.GenerateStruct(pdb)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := policyValidation.ValidatePodDisruptionBudget(pdb, policyValidation.PodDisruptionBudgetValidationOptions{}); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
-func FuzzValidatePodDisruptionBudgetStatusUpdate(data []byte) int {
+func fuzzValidatePodDisruptionBudgetStatusUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	status := policy.PodDisruptionBudgetStatus{}
 	err := f.GenerateStruct(&status)
 	if err != nil {
-		return 0
+		return
 	}
 	oldStatus := policy.PodDisruptionBudgetStatus{}
 	err = f.GenerateStruct(&oldStatus)
 	if err != nil {
-		return 0
+		return
 	}
 	if errs := policyValidation.ValidatePodDisruptionBudgetStatusUpdate(status, oldStatus, field.NewPath("status"), policy.SchemeGroupVersion); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
 	if errs := policyValidation.ValidatePodDisruptionBudgetStatusUpdate(status, oldStatus, field.NewPath("status"), policyv1beta1.SchemeGroupVersion); len(errs) > 0 {
-		for _, err := range errs {
-			_ = err
-			//fmt.Println(err)
-		}
-		return 0
+		return
 	}
-	return 1
+	return
 }
 
 // certificates
 
-func FuzzValidateCertificateSigningRequestCreate(data []byte) int {
+func fuzzValidateCertificateSigningRequestCreate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	csr := &certificates.CertificateSigningRequest{}
 	err := f.GenerateStruct(csr)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(csr)
-	_ = certificatesValidation.ValidateCertificateSigningRequestCreate(csr)
-	return 1
+	if errs := certificatesValidation.ValidateCertificateSigningRequestCreate(csr); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateCertificateSigningRequestUpdate(data []byte) int {
+func fuzzValidateCertificateSigningRequestUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	csr1 := &certificates.CertificateSigningRequest{}
 	err := f.GenerateStruct(csr1)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(csr1)
 	csr2 := &certificates.CertificateSigningRequest{}
 	err = f.GenerateStruct(csr2)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(csr2)
-	_ = certificatesValidation.ValidateCertificateSigningRequestUpdate(csr1, csr2)
-	return 1
+	if errs := certificatesValidation.ValidateCertificateSigningRequestUpdate(csr1, csr2); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateCertificateSigningRequestStatusUpdate(data []byte) int {
+func fuzzValidateCertificateSigningRequestStatusUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	csr1 := &certificates.CertificateSigningRequest{}
 	err := f.GenerateStruct(csr1)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(csr1)
 	csr2 := &certificates.CertificateSigningRequest{}
 	err = f.GenerateStruct(csr2)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(csr2)
-	_ = certificatesValidation.ValidateCertificateSigningRequestStatusUpdate(csr1, csr2)
-	return 1
+	if errs := certificatesValidation.ValidateCertificateSigningRequestStatusUpdate(csr1, csr2); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateCertificateSigningRequestApprovalUpdate(data []byte) int {
+func fuzzValidateCertificateSigningRequestApprovalUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	csr1 := &certificates.CertificateSigningRequest{}
 	err := f.GenerateStruct(csr1)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(csr1)
 	csr2 := &certificates.CertificateSigningRequest{}
 	err = f.GenerateStruct(csr1)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(csr2)
-	_ = certificatesValidation.ValidateCertificateSigningRequestApprovalUpdate(csr1, csr2)
-	return 1
+	if errs := certificatesValidation.ValidateCertificateSigningRequestApprovalUpdate(csr1, csr2); len(errs) > 0 {
+		return
+	}
+	return
 }
 
 // apiextensions-apiserver
-func FuzzValidateCustomResourceDefinition(data []byte) int {
+func fuzzValidateCustomResourceDefinition(data []byte) {
 	f := fuzz.NewConsumer(data)
 	crd := &apiextensions.CustomResourceDefinition{}
 	err := f.GenerateStruct(crd)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(crd)
-	_ = apiextensionsValidation.ValidateCustomResourceDefinition(context.Background(), crd)
-	return 1
+	if errs := apiextensionsValidation.ValidateCustomResourceDefinition(context.Background(), crd); len(errs) > 0 {
+		return
+	}
+	return
 }
 
 // apiserverinternal
 
-func FuzzValidateStorageVersion(data []byte) int {
+func fuzzValidateStorageVersion(data []byte) {
 	f := fuzz.NewConsumer(data)
 	sv := &apiserverinternal.StorageVersion{}
 	err := f.GenerateStruct(sv)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(sv)
-	_ = apiServerInternalValidation.ValidateStorageVersion(sv)
-	return 1
+	if errs := apiServerInternalValidation.ValidateStorageVersion(sv); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateStorageVersionName(data []byte) int {
-	_ = apiServerInternalValidation.ValidateStorageVersionName(string(data), false)
-	return 1
+func fuzzValidateStorageVersionName(data []byte) {
+	if errs := apiServerInternalValidation.ValidateStorageVersionName(string(data), false); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateStorageVersionStatusUpdate(data []byte) int {
+func fuzzValidateStorageVersionStatusUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	sv1 := &apiserverinternal.StorageVersion{}
 	err := f.GenerateStruct(sv1)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(sv1)
 	sv2 := &apiserverinternal.StorageVersion{}
 	err = f.GenerateStruct(sv2)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(sv2)
-	_ = apiServerInternalValidation.ValidateStorageVersionStatusUpdate(sv1, sv2)
-	return 1
+	if errs := apiServerInternalValidation.ValidateStorageVersionStatusUpdate(sv1, sv2); len(errs) > 0 {
+		return
+	}
+	return
 }
 
 // apiserver audit
 
-func FuzzValidatePolicy(data []byte) int {
+func fuzzValidatePolicy(data []byte) {
 	f := fuzz.NewConsumer(data)
 	p := &audit.Policy{}
 	err := f.GenerateStruct(p)
 	if err != nil {
-		return 0
+		return
 	}
-	//fmt.Println(p)
-	_ = auditValidation.ValidatePolicy(p)
-	return 1
+	if errs := auditValidation.ValidatePolicy(p); len(errs) > 0 {
+		return
+	}
+	return
 }
 
 // rbac validation
-func FuzzValidateRoleUpdate(data []byte) int {
+func fuzzValidateRoleUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	role1 := &rbac.Role{}
 	err := f.GenerateStruct(role1)
 	if err != nil {
-		return 0
+		return
 	}
 	role2 := &rbac.Role{}
 	err = f.GenerateStruct(role2)
 	if err != nil {
-		return 0
+		return
 	}
-	_ = rbacValidation.ValidateRoleUpdate(role1, role2)
-	return 1
+	if errs := rbacValidation.ValidateRoleUpdate(role1, role2); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateClusterRoleUpdate(data []byte) int {
+func fuzzValidateClusterRoleUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	clusterRole1 := &rbac.ClusterRole{}
 	err := f.GenerateStruct(clusterRole1)
 	if err != nil {
-		return 0
+		return
 	}
 	clusterRole2 := &rbac.ClusterRole{}
 	err = f.GenerateStruct(clusterRole2)
 	if err != nil {
-		return 0
+		return
 	}
-	_ = rbacValidation.ValidateClusterRoleUpdate(clusterRole1, clusterRole2, rbacValidation.ClusterRoleValidationOptions{})
-	return 1
+	if errs := rbacValidation.ValidateClusterRoleUpdate(clusterRole1, clusterRole2, rbacValidation.ClusterRoleValidationOptions{}); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateRoleBindingUpdate(data []byte) int {
+func fuzzValidateRoleBindingUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	roleBinding1 := &rbac.RoleBinding{}
 	err := f.GenerateStruct(roleBinding1)
 	if err != nil {
-		return 0
+		return
 	}
 	roleBinding2 := &rbac.RoleBinding{}
 	err = f.GenerateStruct(roleBinding2)
 	if err != nil {
-		return 0
+		return
 	}
-	_ = rbacValidation.ValidateRoleBindingUpdate(roleBinding1, roleBinding2)
-	return 1
+	if errs := rbacValidation.ValidateRoleBindingUpdate(roleBinding1, roleBinding2); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateClusterRoleBindingUpdate(data []byte) int {
+func fuzzValidateClusterRoleBindingUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	clusterRoleBinding1 := &rbac.ClusterRoleBinding{}
 	err := f.GenerateStruct(clusterRoleBinding1)
 	if err != nil {
-		return 0
+		return
 	}
 	clusterRoleBinding2 := &rbac.ClusterRoleBinding{}
 	err = f.GenerateStruct(clusterRoleBinding2)
 	if err != nil {
-		return 0
+		return
 	}
-	_ = rbacValidation.ValidateClusterRoleBindingUpdate(clusterRoleBinding1, clusterRoleBinding2)
-	return 1
+	if errs := rbacValidation.ValidateClusterRoleBindingUpdate(clusterRoleBinding1, clusterRoleBinding2); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzCompactRules(data []byte) int {
+func fuzzCompactRules(data []byte) {
 	f := fuzz.NewConsumer(data)
 	rules := make([]rbacv1.PolicyRule, 0)
 	err := f.CreateSlice(&rules)
 	if err != nil {
-		return 0
+		return
 	}
-	_, _ = rbacregistryvalidation.CompactRules(rules)
-	return 1
+	_, err = rbacregistryvalidation.CompactRules(rules)
+	if err != nil {
+		return
+	}
+	return
 }
 
-func FuzzValidateResourceQuotaSpec(data []byte) int {
+func fuzzValidateResourceQuotaSpec(data []byte) {
 	f := fuzz.NewConsumer(data)
 	resourceQuotaSpec := &core.ResourceQuotaSpec{}
 	err := f.GenerateStruct(resourceQuotaSpec)
 	if err != nil {
-		return 0
+		return
 	}
 	fld := &field.Path{}
 	err = f.GenerateStruct(fld)
 	if err != nil {
-		return 0
+		return
 	}
-	_ = validation.ValidateResourceQuotaSpec(resourceQuotaSpec, fld)
-	return 1
+	if errs := validation.ValidateResourceQuotaSpec(resourceQuotaSpec, fld); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateResourceQuotaUpdate(data []byte) int {
+func fuzzValidateResourceQuotaUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	newResourceQuota := &core.ResourceQuota{}
 	err := f.GenerateStruct(newResourceQuota)
 	if err != nil {
-		return 0
+		return
 	}
 	oldResourceQuota := &core.ResourceQuota{}
 	err = f.GenerateStruct(oldResourceQuota)
 	if err != nil {
-		return 0
+		return
 	}
-	_ = validation.ValidateResourceQuotaUpdate(newResourceQuota, oldResourceQuota)
-	return 1
+	if errs := validation.ValidateResourceQuotaUpdate(newResourceQuota, oldResourceQuota); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateResourceQuotaStatusUpdate(data []byte) int {
+func fuzzValidateResourceQuotaStatusUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	newResourceQuota := &core.ResourceQuota{}
 	err := f.GenerateStruct(newResourceQuota)
 	if err != nil {
-		return 0
+		return
 	}
 	oldResourceQuota := &core.ResourceQuota{}
 	err = f.GenerateStruct(oldResourceQuota)
 	if err != nil {
-		return 0
+		return
 	}
-	_ = validation.ValidateResourceQuotaStatusUpdate(newResourceQuota, oldResourceQuota)
-	return 1
+	if errs := validation.ValidateResourceQuotaStatusUpdate(newResourceQuota, oldResourceQuota); len(errs) > 0 {
+		return
+	}
+	return
 }
 
-func FuzzValidateServiceStatusUpdate(data []byte) int {
+func fuzzValidateServiceStatusUpdate(data []byte) {
 	f := fuzz.NewConsumer(data)
 	service := &core.Service{}
 	err := f.GenerateStruct(service)
 	if err != nil {
-		return 0
+		return
 	}
 	oldService := &core.Service{}
 	err = f.GenerateStruct(oldService)
 	if err != nil {
-		return 0
+		return
 	}
-	_ = validation.ValidateServiceStatusUpdate(service, oldService)
-	return 1
+	if errs := validation.ValidateServiceStatusUpdate(service, oldService); len(errs) > 0 {
+		return
+	}
+	return
 }
