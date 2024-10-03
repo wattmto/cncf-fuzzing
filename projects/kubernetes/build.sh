@@ -45,40 +45,26 @@ export KUBE_FUZZERS=$SRC/cncf-fuzzing/projects/kubernetes
 mv $SRC/cncf-fuzzing/projects/kubernetes/roundtrip.go \
    $SRC/kubernetes/staging/src/k8s.io/apimachinery/pkg/api/apitesting/roundtrip/
 
-mv $KUBE_FUZZERS/fuzz_test.go \
-   $SRC/kubernetes/pkg/kubelet/server/
-mv $SRC/kubernetes/pkg/kubelet/server/auth_test.go \
-   $SRC/kubernetes/pkg/kubelet/server/auth_test_fuzz.go
-mv $SRC/kubernetes/pkg/kubelet/server/server_test.go \
-   $SRC/kubernetes/pkg/kubelet/server/server_test_fuzz.go
+mv $KUBE_FUZZERS/internal_kubelet_server_fuzzer.go \
+   $SRC/kubernetes/pkg/kubelet/server/fuzz_test.go
 
-mv $KUBE_FUZZERS/fuzz_test.go \
-   $SRC/kubernetes/pkg/kubelet/kuberuntime/
-mv $SRC/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager_test.go \
-   $SRC/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager_test_fuzz.go
+mv $KUBE_FUZZERS/internal_kubelet_kuberuntime_fuzzer.go \
+   $SRC/kubernetes/pkg/kubelet/kuberuntime/fuzz_test.go
 
 
-mv $KUBE_FUZZERS/fuzz_test.go \
-   $SRC/kubernetes/pkg/kubelet
-mv $SRC/kubernetes/pkg/kubelet/kubelet_pods_test.go \
-   $SRC/kubernetes/pkg/kubelet/kubelet_pods_test_fuzz.go
-mv $SRC/kubernetes/pkg/kubelet/pod_workers_test.go \
-   $SRC/kubernetes/pkg/kubelet/pod_workers_test_fuzz.go
-mv $SRC/kubernetes/pkg/kubelet/kubelet_test.go \
-   $SRC/kubernetes/pkg/kubelet/kubelet_test_fuzz.go
-mv $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test.go \
-   $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test_fuzz.go
+mv $KUBE_FUZZERS/internal_kubelet_fuzzer.go \
+   $SRC/kubernetes/pkg/kubelet/fuzz_test.go
 
-mv $KUBE_FUZZERS/fuzz_test.go \
+mv $KUBE_FUZZERS/mount-utils_fuzzer.go \
    $SRC/kubernetes/staging/src/k8s.io/mount-utils/
 
-mv $KUBE_FUZZERS/fuzz_test.go \
+mv $KUBE_FUZZERS/deployment_util_fuzzer.go \
    $SRC/kubernetes/pkg/controller/deployment/util/
 
-mv $KUBE_FUZZERS/fuzz_test.go \
+mv $KUBE_FUZZERS/api_roundtrip_fuzzer.go \
    $SRC/kubernetes/test/fuzz/fuzzing/
 mv $KUBE_FUZZERS/native_go_parser_fuzzers_test.go \
-    $SRC/kubernetes/test/fuzz/fuzzing/
+   $SRC/kubernetes/test/fuzz/fuzzing/
 
 mkdir -p $SRC/kubernetes/test/fuzz/fuzzing/native_fuzzing && cd $SRC/kubernetes/test/fuzz/fuzzing/native_fuzzing
 # Create empty file that imports "github.com/AdamKorcz/go-118-fuzz-build/utils"
