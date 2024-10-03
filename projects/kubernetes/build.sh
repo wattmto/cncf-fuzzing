@@ -59,14 +59,14 @@ mv $SRC/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager_test.go \
 
 mv $KUBE_FUZZERS/internal_kubelet_fuzzer.go \
    $SRC/kubernetes/pkg/kubelet/fuzz_test.go
-mv $KUBE_FUZZERS/kubelet_pods_test_fuzzer.go \
-   $SRC/kubernetes/pkg/kubelet/
-mv $KUBE_FUZZERS/pod_workers_test_fuzzer.go \
-   $SRC/kubernetes/pkg/kubelet/
-mv $KUBE_FUZZERS/kubelet_test_fuzzer.go \
-   $SRC/kubernetes/pkg/kubelet/
-mv $KUBE_FUZZERS/kubelet_node_status_test_fuzzer.go \
-   $SRC/kubernetes/pkg/kubelet/
+mv $SRC/kubernetes/pkg/kubelet/kubelet_pods_test.go \
+   $SRC/kubernetes/pkg/kubelet/kubelet_pods_test_fuzz.go
+mv $SRC/kubernetes/pkg/kubelet/pod_workers_test.go \
+   $SRC/kubernetes/pkg/kubelet/pod_workers_test_fuzz.go
+mv $SRC/kubernetes/pkg/kubelet/kubelet_test.go \
+   $SRC/kubernetes/pkg/kubelet/kubelet_test_fuzz.go
+mv $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test.go \
+   $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test_fuzz.go
 
 mv $KUBE_FUZZERS/mount-utils_fuzzer.go \
    $SRC/kubernetes/staging/src/k8s.io/mount-utils/fuzz_test.go
