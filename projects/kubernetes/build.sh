@@ -47,12 +47,26 @@ mv $SRC/cncf-fuzzing/projects/kubernetes/roundtrip.go \
 
 mv $KUBE_FUZZERS/internal_kubelet_server_fuzzer.go \
    $SRC/kubernetes/pkg/kubelet/server/fuzz_test.go
+mv $SRC/kubernetes/pkg/kubelet/server/auth_test.go \
+   $SRC/kubernetes/pkg/kubelet/server/auth_test_fuzz.go
+mv $SRC/kubernetes/pkg/kubelet/server/server_test.go \
+   $SRC/kubernetes/pkg/kubelet/server/server_test_fuzz.go
 
 mv $KUBE_FUZZERS/internal_kubelet_kuberuntime_fuzzer.go \
    $SRC/kubernetes/pkg/kubelet/kuberuntime/fuzz_test.go
+mv $SRC/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager_test.go \
+   $SRC/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager_test_fuzz.go
 
 mv $KUBE_FUZZERS/internal_kubelet_fuzzer.go \
    $SRC/kubernetes/pkg/kubelet/fuzz_test.go
+mv $SRC/kubernetes/pkg/kubelet/kubelet_pods_test.go \
+   $SRC/kubernetes/pkg/kubelet/kubelet_pods_test_fuzz.go
+mv $SRC/kubernetes/pkg/kubelet/pod_workers_test.go \
+   $SRC/kubernetes/pkg/kubelet/pod_workers_test_fuzz.go
+mv $SRC/kubernetes/pkg/kubelet/kubelet_test.go \
+   $SRC/kubernetes/pkg/kubelet/kubelet_test_fuzz.go
+mv $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test.go \
+   $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test_fuzz.go
 
 mv $KUBE_FUZZERS/mount-utils_fuzzer.go \
    $SRC/kubernetes/staging/src/k8s.io/mount-utils/fuzz_test.go
