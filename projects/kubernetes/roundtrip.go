@@ -22,7 +22,6 @@ import (
 	"math/rand"
 	"reflect"
 	"strings"
-	"testing"
 
 	"github.com/davecgh/go-spew/spew"
 	//nolint:staticcheck //iccheck // SA1019 Keep using deprecated module; it still seems to be maintained and the api of the recommended replacement differs
@@ -31,6 +30,7 @@ import (
 	flag "github.com/spf13/pflag"
 
 	gfh "github.com/AdaLogics/go-fuzz-headers"
+	"github.com/AdamKorcz/go-118-fuzz-build/testing"
 	apitesting "k8s.io/apimachinery/pkg/api/apitesting"
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
@@ -108,16 +108,15 @@ var globalNonRoundTrippableTypes = sets.NewString(
 // GlobalNonRoundTrippableTypes returns the kinds that are effectively reserved across all GroupVersions.
 // They don't roundtrip and thus can be excluded in any custom/downstream roundtrip tests
 //
-//  kinds := scheme.AllKnownTypes()
-//  for gvk := range kinds {
-//      if roundtrip.GlobalNonRoundTrippableTypes().Has(gvk.Kind) {
-//          continue
-//      }
-//      t.Run(gvk.Group+"."+gvk.Version+"."+gvk.Kind, func(t *testing.T) {
-//          // roundtrip test
-//      })
-//  }
-//
+//	kinds := scheme.AllKnownTypes()
+//	for gvk := range kinds {
+//	    if roundtrip.GlobalNonRoundTrippableTypes().Has(gvk.Kind) {
+//	        continue
+//	    }
+//	    t.Run(gvk.Group+"."+gvk.Version+"."+gvk.Kind, func(t *testing.T) {
+//	        // roundtrip test
+//	    })
+//	}
 func GlobalNonRoundTrippableTypes() sets.String {
 	return sets.NewString(globalNonRoundTrippableTypes.List()...)
 }
@@ -321,11 +320,11 @@ func roundTripOfExternalType(t *testing.T, scheme *runtime.Scheme, codecFactory 
 //
 // For internal types this means
 //
-//   internal -> external -> json/protobuf -> external -> internal.
+//	internal -> external -> json/protobuf -> external -> internal.
 //
 // For external types this means
 //
-//   external -> json/protobuf -> external.
+//	external -> json/protobuf -> external.
 func roundTrip(t *testing.T, scheme *runtime.Scheme, codec runtime.Codec, object runtime.Object) {
 	printer := spew.ConfigState{DisableMethods: true}
 	original := object
