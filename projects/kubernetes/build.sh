@@ -61,9 +61,11 @@ mv $KUBE_FUZZERS/internal_kubelet_fuzzer.go \
    $SRC/kubernetes/pkg/kubelet/fuzz_test.go
 mv $KUBE_FUZZERS/kubelet_pods_test_fuzzer.go \
    $SRC/kubernetes/pkg/kubelet/
+mv $KUBE_FUZZERS/pod_workers_test_fuzzer.go \
+   $SRC/kubernetes/pkg/kubelet/
 mv $KUBE_FUZZERS/kubelet_test_fuzzer.go \
    $SRC/kubernetes/pkg/kubelet/
-mv $KUBE_FUZZERS/pod_workers_test_fuzzer.go \
+mv $KUBE_FUZZERS/kubelet_node_status_test_fuzzer.go \
    $SRC/kubernetes/pkg/kubelet/
 
 mv $KUBE_FUZZERS/mount-utils_fuzzer.go \
