@@ -45,20 +45,20 @@ export KUBE_FUZZERS=$SRC/cncf-fuzzing/projects/kubernetes
 mv $SRC/cncf-fuzzing/projects/kubernetes/roundtrip.go \
    $SRC/kubernetes/staging/src/k8s.io/apimachinery/pkg/api/apitesting/roundtrip/
 
-mv $KUBE_FUZZERS/internal_kubelet_server_fuzzer.go \
+mv $KUBE_FUZZERS/fuzz_test.go \
    $SRC/kubernetes/pkg/kubelet/server/
 mv $SRC/kubernetes/pkg/kubelet/server/auth_test.go \
    $SRC/kubernetes/pkg/kubelet/server/auth_test_fuzz.go
 mv $SRC/kubernetes/pkg/kubelet/server/server_test.go \
    $SRC/kubernetes/pkg/kubelet/server/server_test_fuzz.go
 
-mv $KUBE_FUZZERS/internal_kubelet_kuberuntime_fuzzer.go \
+mv $KUBE_FUZZERS/fuzz_test.go \
    $SRC/kubernetes/pkg/kubelet/kuberuntime/
 mv $SRC/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager_test.go \
    $SRC/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager_test_fuzz.go
 
 
-mv $KUBE_FUZZERS/internal_kubelet_fuzzer.go \
+mv $KUBE_FUZZERS/fuzz_test.go \
    $SRC/kubernetes/pkg/kubelet
 mv $SRC/kubernetes/pkg/kubelet/kubelet_pods_test.go \
    $SRC/kubernetes/pkg/kubelet/kubelet_pods_test_fuzz.go
@@ -69,23 +69,18 @@ mv $SRC/kubernetes/pkg/kubelet/kubelet_test.go \
 mv $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test.go \
    $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test_fuzz.go
 
-mv $KUBE_FUZZERS/mount-utils_fuzzer.go \
+mv $KUBE_FUZZERS/fuzz_test.go \
    $SRC/kubernetes/staging/src/k8s.io/mount-utils/
 
-mv $KUBE_FUZZERS/deployment_util_fuzzer.go \
+mv $KUBE_FUZZERS/fuzz_test.go \
    $SRC/kubernetes/pkg/controller/deployment/util/
 
-mv $KUBE_FUZZERS/api_roundtrip_fuzzer.go \
+mv $KUBE_FUZZERS/fuzz_test.go \
    $SRC/kubernetes/test/fuzz/fuzzing/
-# Done moving fuzzers and tests
-#############################################################################
+mv $KUBE_FUZZERS/native_go_parser_fuzzers_test.go \
+    $SRC/kubernetes/test/fuzz/fuzzing/
 
-cd $SRC/kubernetes/test/fuzz/fuzzing
-
-# Build Go 1.18 fuzzers
-#############################################################################
-cp $KUBE_FUZZERS/native_go_parser_fuzzers_test.go ./
-mkdir native_fuzzing && cd native_fuzzing
+mkdir -p $SRC/kubernetes/test/fuzz/fuzzing/native_fuzzing && cd $SRC/kubernetes/test/fuzz/fuzzing/native_fuzzing
 # Create empty file that imports "github.com/AdamKorcz/go-118-fuzz-build/utils"
 # This is a small hack to install this dependency, since it is not used anywhere,
 # and Go would therefore remove it from go.mod once we run "go mod tidy && go mod vendor".
@@ -115,50 +110,35 @@ compile_native_go_fuzzer k8s.io/kubernetes/test/fuzz/fuzzing FuzzParseEnv fuzz_p
 compile_native_go_fuzzer k8s.io/kubernetes/test/fuzz/fuzzing FuzzParseQOSReserve fuzz_parse_qos_reserve
 compile_native_go_fuzzer k8s.io/kubernetes/test/fuzz/fuzzing FuzzParseCPUSet fuzz_parse_cpu_set
 compile_native_go_fuzzer k8s.io/kubernetes/test/fuzz/fuzzing FuzzParseImageName fuzz_parse_image_name
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzApiRoundtrip fuzz_api_roundtrip
+compile_native_go_fuzzer kubernetes/pkg/kubelet/kuberuntime FuzzKubeRuntime fuzz_kube_runtime
+compile_native_go_fuzzer kubernetes/pkg/kubelet FuzzSyncPod fuzz_sync_pod
+compile_native_go_fuzzer kubernetes/pkg/kubelet FuzzStrategicMergePatch fuzz_strategic_merge_patch
+compile_native_go_fuzzer kubernetes/pkg/kubelet FuzzconvertToAPIContainerStatuses fuzz_convert_to_api_container_statuses
+compile_native_go_fuzzer kubernetes/pkg/kubelet FuzzHandlePodCleanups fuzz_handle_pod_cleanups
+compile_native_go_fuzzer kubernetes/pkg/kubelet FuzzMakeEnvironmentVariables fuzz_make_environment_variables
+compile_native_go_fuzzer kubernetes/pkg/controller/deployment/util FuzzEntireDeploymentUtil fuzz_entire_deployment_util
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzDeepCopy fuzz_deep_copy
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzAesRoundtrip fuzz_aes_roundtrip
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzLoadPolicyFromBytes fuzz_load_policy_from_bytes
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing RegistryFuzzer registry_fuzzer
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzUnrecognized fuzz_unrecognized
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzRoundTripSpecificKind fuzz_roundtrip_specific_kind
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzControllerRoundtrip fuzz_controller_roundtrip
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzKubeletSchemeRoundtrip fuzz_kubelet_scheme_roundtrip
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzProxySchemeRoundtrip fuzz_proxy_scheme_roundtrip
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzRoundTripType fuzz_rountrip_type
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzReadLogs fuzz_read_logs
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzRoundtrip fuzz_roundtrip
+compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzAllValidation fuzz_all_validation
+# disable this fuzzer for now
+#compile_native_go_fuzzer k8s.io/kubernetes/pkg/kubelet/server FuzzRequest fuzz_request
+
 # Done building Go 1.18 fuzzers
 #############################################################################
 
-# Build go-fuzz fuzzers
-#############################################################################
-cd $SRC/kubernetes/test/fuzz/fuzzing
-
-# copy over the fuzzers from cncf-fuzzing
-rm $KUBE_FUZZERS/parser_fuzzer.go
-cp $SRC/cncf-fuzzing/projects/kubernetes/*.go \
-   $SRC/kubernetes/test/fuzz/fuzzing/
-rm native_go_parser_fuzzers_test.go
-
-# disable this fuzzer for now
-#compile_go_fuzzer k8s.io/kubernetes/pkg/kubelet/server FuzzRequest fuzz_request
-
-go mod tidy && go work vendor
-
 # Delete broken fuzzer from a 3rd-party dependency
 #find $SRC/kubernetes/vendor/github.com/cilium/ebpf/internal/btf -name "fuzz.go" -exec rm -rf {} \;
-
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzApiRoundtrip fuzz_api_roundtrip
-compile_go_fuzzer kubernetes/pkg/kubelet/kuberuntime FuzzKubeRuntime fuzz_kube_runtime
-compile_go_fuzzer kubernetes/pkg/kubelet FuzzSyncPod fuzz_sync_pod
-compile_go_fuzzer kubernetes/pkg/kubelet FuzzStrategicMergePatch fuzz_strategic_merge_patch
-compile_go_fuzzer kubernetes/pkg/kubelet FuzzconvertToAPIContainerStatuses fuzz_convert_to_api_container_statuses
-compile_go_fuzzer kubernetes/pkg/kubelet FuzzHandlePodCleanups fuzz_handle_pod_cleanups
-compile_go_fuzzer kubernetes/pkg/kubelet FuzzMakeEnvironmentVariables fuzz_make_environment_variables
-compile_go_fuzzer kubernetes/pkg/controller/deployment/util FuzzEntireDeploymentUtil fuzz_entire_deployment_util
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzDeepCopy fuzz_deep_copy
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzAesRoundtrip fuzz_aes_roundtrip
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzLoadPolicyFromBytes fuzz_load_policy_from_bytes
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing RegistryFuzzer registry_fuzzer
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzUnrecognized fuzz_unrecognized
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzRoundTripSpecificKind fuzz_roundtrip_specific_kind
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzControllerRoundtrip fuzz_controller_roundtrip
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzKubeletSchemeRoundtrip fuzz_kubelet_scheme_roundtrip
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzProxySchemeRoundtrip fuzz_proxy_scheme_roundtrip
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzRoundTripType fuzz_rountrip_type
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzReadLogs fuzz_read_logs
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzRoundtrip fuzz_roundtrip
-compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzAllValidation fuzz_all_validation
-# Done building go-fuzz fuzzers
-#############################################################################
 
 # Create fuzzers for all marshaling and unmarshaling routines
 #############################################################################
@@ -174,5 +154,5 @@ fi
 #############################################################################
 
 if [ "$SANITIZER" != "coverage" ]; then
-   compile_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzApiMarshaling fuzz_api_marshaling
+   compile_native_go_fuzzer kubernetes/test/fuzz/fuzzing FuzzApiMarshaling fuzz_api_marshaling
 fi
