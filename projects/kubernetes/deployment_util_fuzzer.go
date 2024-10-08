@@ -21,7 +21,6 @@ import (
 	intstrutil "k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
-	"k8s.io/klog/v2"
 	"testing"
 
 	fuzz "github.com/AdaLogics/go-fuzz-headers"
