@@ -29,17 +29,17 @@ import (
 )
 
 var (
-	functionsToCall = map[int]string {
-		0: "fuzzSetDeploymentCondition",
-		1: "fuzzRemoveDeploymentCondition",
-		2: "fuzzSetDeploymentRevision",
-		3: "fuzzMaxAndLastRevision",
-		4: "fuzzSetNewReplicaSetAnnotations",
-		5: "fuzzSetDeploymentAnnotationsTo",
-		6: "fuzzFindActiveOrLatest",
-		7: "fuzzGetDesiredReplicasAnnotation",
-		8: "fuzzSetReplicasAnnotations",
-		9: "fuzzReplicasAnnotationsNeedUpdate",
+	functionsToCall = map[int]string{
+		0:  "fuzzSetDeploymentCondition",
+		1:  "fuzzRemoveDeploymentCondition",
+		2:  "fuzzSetDeploymentRevision",
+		3:  "fuzzMaxAndLastRevision",
+		4:  "fuzzSetNewReplicaSetAnnotations",
+		5:  "fuzzSetDeploymentAnnotationsTo",
+		6:  "fuzzFindActiveOrLatest",
+		7:  "fuzzGetDesiredReplicasAnnotation",
+		8:  "fuzzSetReplicasAnnotations",
+		9:  "fuzzReplicasAnnotationsNeedUpdate",
 		10: "fuzzMaxUnavailable",
 		11: "fuzzMinAvailable",
 		12: "fuzzMaxSurge",
