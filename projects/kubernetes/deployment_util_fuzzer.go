@@ -96,7 +96,7 @@ func FuzzEntireDeploymentUtil(f *testing.F) {
 			fuzzFindNewReplicaSet(data[1:])
 		case "fuzzFindOldReplicaSets":
 			fuzzFindOldReplicaSets(data[1:])
-		case "fuzzGetReplicaCountForReplicaSets"
+		case "fuzzGetReplicaCountForReplicaSets":
 			fuzzGetReplicaCountForReplicaSets(data[1:])
 		case "fuzzGetActualReplicaCountForReplicaSets":
 			fuzzGetActualReplicaCountForReplicaSets(data[1:])
