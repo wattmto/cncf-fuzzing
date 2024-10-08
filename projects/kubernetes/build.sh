@@ -69,6 +69,7 @@ mv $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test.go \
    $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test_fuzz.go
 
 sed -i 's/"testing"/"github.com\/AdamKorcz\/go-118-fuzz-build\/testing"/' $SRC/kubernetes/pkg/kubelet/kubelet_test_fuzz.go
+sed -i 's/"testing"/"github.com\/AdamKorcz\/go-118-fuzz-build\/testing"/' $SRC/kubernetes/pkg/kubelet/kubelet_node_status_test_fuzz.go
 
 mv $KUBE_FUZZERS/mount-utils_fuzzer.go \
    $SRC/kubernetes/staging/src/k8s.io/mount-utils/fuzz_test.go
