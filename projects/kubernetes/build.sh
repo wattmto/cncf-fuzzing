@@ -152,6 +152,8 @@ compile_native_go_fuzzer k8s.io/kubernetes/test/fuzz/fuzzing FuzzAllValidation f
 # Done building Go 1.18 fuzzers
 #############################################################################
 
+go mod tidy && go work vendor
+
 # Delete broken fuzzer from a 3rd-party dependency
 #find $SRC/kubernetes/vendor/github.com/cilium/ebpf/internal/btf -name "fuzz.go" -exec rm -rf {} \;
 
